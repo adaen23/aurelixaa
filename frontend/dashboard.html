@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AURELIXA</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:#f0f8ff;color:#1a3a5c;font-family:'Segoe UI',sans-serif;padding:20px;min-height:100vh}
+        .container{max-width:1000px;margin:0 auto}
+        .header{display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:2px solid #b8d4e8;margin-bottom:30px;flex-wrap:wrap;gap:15px}
+        .header h1{font-size:2rem;color:#1a5a8c;font-weight:800}
+        .header .user-info{color:#6a8aaa;font-size:0.9rem}
+        .header .user-info .plan-badge{display:inline-block;padding:4px 15px;border-radius:20px;font-size:0.8rem;font-weight:600;margin-left:10px}
+        .plan-badge.free{background:#d8e8f0;color:#6a8aaa}
+        .plan-badge.pro{background:#4a90d9;color:white}
+        .plan-badge.elite{background:#9b59b6;color:white}
+        .plan-badge.lifetime{background:#e67e22;color:white}
+        .header .admin-link{color:#4a90d9;text-decoration:none;font-size:0.85rem;margin-left:15px}
+        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px;margin-bottom:30px}
+        .stat-card{background:white;border:2px solid #b8d4e8;border-radius:12px;padding:20px;text-align:center}
+        .stat-card .number{font-size:2.5rem;font-weight:800;color:#1a5a8c}
+        .stat-card .label{color:#6a8aaa;font-size:0.8rem}
+        .btn-deploy{width:100%;background:#4a90d9;color:white;border:none;padding:18px;font-size:1.3rem;font-weight:700;border-radius:12px;cursor:pointer;transition:0.3s;font-family:'Segoe UI',sans-serif}
+        .btn-deploy:hover{background:#3a7ac4}
+        .btn-deploy:disabled{opacity:0.4;cursor:not-allowed}
+        .deploy-status{color:#6a8aaa;margin-top:10px;font-size:0.9rem;text-align:center}
+        .section{background:white;border-radius:12px;padding:25px;margin-top:25px;border:2px solid #b8d4e8}
+        .section h2{color:#1a5a8c;font-size:1.2rem;margin-bottom:15px}
+        .section label{color:#6a8aaa;display:block;margin-bottom:5px;font-size:0.9rem}
+        .section input{width:100%;padding:12px;border:2px solid #d8e8f0;border-radius:8px;font-size:1rem}
+        .section input:focus{outline:none;border-color:#4a90d9}
+        .section .btn-small{background:#4a90d9;color:white;border:none;padding:10px 25px;border-radius:8px;cursor:pointer;margin-top:10px;font-weight:600}
+        .section .btn-small:hover{background:#3a7ac4}
+        .deployment-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #d8e8f0;flex-wrap:wrap;gap:10px}
+        .deployment-item .url{color:#4a90d9;font-weight:600}
+        .deployment-item .status{font-size:0.8rem;font-weight:600}
+        .deployment-item .status.active{color:#27ae60}
+        .deployment-item .status.expired{color:#95a5a6}
+        .deployment-item .delete-btn{background:transparent;color:#e74c3c;border:1px solid #e74c3c;padding:5px 15px;border-radius:6px;cursor:pointer;font-size:0.8rem;transition:0.3s}
+        .deployment-item .delete-btn:hover{background:#e74c3c;color:white}
+        .upgrade-section{background:#f8fbff;border:2px dashed #4a90d9;border-radius:12px;padding:20px;text-align:center;margin-top:25px}
+        .upgrade-section p{color:#6a8aaa;margin-bottom:10px}
+        .logout-btn{background:transparent;color:#95a5a6;border:1px solid #d8e8f0;padding:8px 20px;border-radius:8px;cursor:pointer;transition:0.3s}
+        .logout-btn:hover{background:#d8e8f0}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AURELIXA</h1>
+            <div style="display:flex;align-items:center;gap:15px;flex-wrap:wrap;">
+                <div class="user-info">
+                    <span id="userEmail">loading...</span>
+                    <span id="userPlan" class="plan-badge free">FREE</span>
+                    <a href="admin-login.html" class="admin-link">⚙️ Admin</a>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card"><div class="number" id="deploysUsed">0</div><div class="label">Deploys Today</div></div>
+            <div class="stat-card"><div class="number" id="deploysLeft">2</div><div class="label">Deploys Left</div></div>
+            <div class="stat-card"><div class="number" id="totalVisits">0</div><div class="label">Total Visits</div></div>
+            <div class="stat-card"><div class="number" id="activeLinks">0</div><div class="label">Active Links</div></div>
+        </div>
+
+        <button class="btn-deploy" id="deployBtn">⚡ DEPLOY NEW LINK</button>
+        <div id="deployStatus" class="deploy-status"></div>
+
+        <div class="section">
+            <h2>🔗 Your Discord Webhook</h2>
+            <label>Where victim data gets sent</label>
+            <input type="text" id="webhookInput" placeholder="https://discord.com/api/webhooks/...">
+            <button class="btn-small" id="saveWebhookBtn">Save Webhook</button>
+            <div id="webhookStatus" style="color:#6a8aaa;margin-top:5px;font-size:0.85rem;"></div>
+        </div>
+
+        <div class="section">
+            <h2>📋 Your Active Links</h2>
+            <div id="deploymentList">
+                <div style="color:#8aabba;text-align:center;padding:20px;">No active links</div>
+            </div>
+        </div>
+
+        <div class="upgrade-section">
+            <p>🔥 Want more deploys? Contact <strong>@briefjes</strong> on Discord to upgrade your plan!</p>
+            <p style="font-size:0.8rem;color:#8aabba;">Pro: $9.99/mo | Elite: $15/mo | Lifetime: $25 one-time</p>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://api.aurelixa.online';
+        let token = localStorage.getItem('token');
+        if (!token) window.location.href = 'login.html';
+
+        async function loadUser() {
+            try {
+                const res = await fetch(API_URL + '/api/auth/me', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!res.ok) throw new Error('Unauthorized');
+                const data = await res.json();
+                const user = data.user;
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('userPlan').textContent = user.plan.toUpperCase();
+                document.getElementById('userPlan').className = 'plan-badge ' + user.plan;
+                if (user.webhook) document.getElementById('webhookInput').value = user.webhook;
+                loadDeployments();
+                loadStats();
+            } catch (e) {
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            }
+        }
+
+        async function loadDeployments() {
+            try {
+                const res = await fetch(API_URL + '/api/deploy/my', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await res.json();
+                const list = document.getElementById('deploymentList');
+                if (!data.deployments || data.deployments.length === 0) {
+                    list.innerHTML = '<div style="color:#8aabba;text-align:center;padding:20px;">No active links</div>';
+                    return;
+                }
+                let html = '';
+                data.deployments.forEach(d => {
+                    const expires = new Date(d.expiresAt);
+                    const now = new Date();
+                    const active = expires > now && d.active;
+                    html += `
+                        <div class="deployment-item">
+                            <span class="url">${d.url}</span>
+                            <span>
+                                <span class="status ${active ? 'active' : 'expired'}">${active ? '🟢 ACTIVE' : '🔴 EXPIRED'}</span>
+                                <span style="color:#8aabba;font-size:0.8rem;margin-left:10px;">${d.visits || 0} visits</span>
+                                ${active ? `<button class="delete-btn" onclick="deleteDeploy('${d.subdomain}')">✕</button>` : ''}
+                            </span>
+                        </div>
+                    `;
+                });
+                list.innerHTML = html;
+                document.getElementById('activeLinks').textContent = data.deployments.filter(d => new Date(d.expiresAt) > new Date() && d.active).length;
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadStats() {
+            try {
+                const res = await fetch(API_URL + '/api/deploy/my', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await res.json();
+                const userRes = await fetch(API_URL + '/api/auth/me', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const userData = await userRes.json();
+                const user = userData.user;
+                let limit = 2;
+                if (user.plan === 'pro') limit = 10;
+                if (user.plan === 'elite') limit = 50;
+                if (user.plan === 'lifetime') limit = 999;
+                const today = new Date().toDateString();
+                const todayDeploys = data.deployments ? data.deployments.filter(d => new Date(d.createdAt).toDateString() === today).length : 0;
+                document.getElementById('deploysUsed').textContent = todayDeploys;
+                document.getElementById('deploysLeft').textContent = Math.max(0, limit - todayDeploys);
+                let totalVisits = 0;
+                if (data.deployments) data.deployments.forEach(d => totalVisits += (d.visits || 0));
+                document.getElementById('totalVisits').textContent = totalVisits;
+            } catch (e) { console.error(e); }
+        }
+
+        document.getElementById('deployBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('deployBtn');
+            const status = document.getElementById('deployStatus');
+            btn.disabled = true;
+            btn.textContent = '⏳ DEPLOYING...';
+            status.textContent = '';
+            try {
+                const res = await fetch(API_URL + '/api/deploy/new', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    status.textContent = '❌ ' + (data.error || 'Something went wrong');
+                    status.style.color = '#e74c3c';
+                    btn.disabled = false;
+                    btn.textContent = '⚡ DEPLOY NEW LINK';
+                    return;
+                }
+                status.textContent = '✅ Deployed! ' + data.url + ' (expires in ' + data.expiresIn + ')';
+                status.style.color = '#27ae60';
+                navigator.clipboard.writeText(data.url);
+                status.textContent += ' 📋 Copied!';
+                loadDeployments();
+                loadStats();
+            } catch (e) {
+                status.textContent = '❌ Network error';
+                status.style.color = '#e74c3c';
+            }
+            btn.disabled = false;
+            btn.textContent = '⚡ DEPLOY NEW LINK';
+        });
+
+        document.getElementById('saveWebhookBtn').addEventListener('click', async () => {
+            const webhook = document.getElementById('webhookInput').value.trim();
+            const status = document.getElementById('webhookStatus');
+            if (!webhook || !webhook.includes('discord.com/api/webhooks')) {
+                status.textContent = '❌ Invalid Discord webhook URL';
+                status.style.color = '#e74c3c';
+                return;
+            }
+            try {
+                const res = await fetch(API_URL + '/api/auth/webhook', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ webhook })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    status.textContent = '✅ Webhook saved!';
+                    status.style.color = '#27ae60';
+                } else {
+                    status.textContent = '❌ ' + data.error;
+                    status.style.color = '#e74c3c';
+                }
+            } catch (e) {
+                status.textContent = '❌ Network error';
+                status.style.color = '#e74c3c';
+            }
+        });
+
+        window.deleteDeploy = async (subdomain) => {
+            if (!confirm('Delete this deployment?')) return;
+            try {
+                await fetch(API_URL + '/api/deploy/' + subdomain, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                loadDeployments();
+                loadStats();
+            } catch (e) { console.error(e); }
+        };
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+
+        loadUser();
+    </script>
+</body>
+</html>
