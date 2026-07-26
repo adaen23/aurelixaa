@@ -15,7 +15,7 @@ router.post('/login', async (req, res) => {
     res.json({ token });
   } catch (error) {
     console.error('Admin login error:', error);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
 
@@ -40,11 +40,11 @@ router.get('/users', async (req, res) => {
     res.json({ users: usersWithStats });
   } catch (error) {
     console.error('Error fetching users:', error);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
 
-// ===== UPDATE USER PLAN (SIMPLE FIX) =====
+// ===== UPDATE USER PLAN =====
 router.put('/user/:userId/plan', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -58,13 +58,11 @@ router.put('/user/:userId/plan', async (req, res) => {
     
     console.log('📝 Update plan - User:', userId, 'Plan:', plan);
     
-    // Check if user exists
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
     
-    // Update plan
     user.plan = plan;
     await user.save();
     
@@ -230,4 +228,4 @@ router.get('/stats', async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = router; // ← EEN KEER!
