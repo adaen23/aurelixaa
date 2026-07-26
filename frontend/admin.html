@@ -12,8 +12,7 @@
         *{margin:0;padding:0;box-sizing:border-box}
         body{background:#0a0a0f;color:#e8e8e8;font-family:'Inter',sans-serif;padding:24px;min-height:100vh;position:relative}
         body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(124,58,237,0.04) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(124,58,237,0.03) 0%,transparent 60%);pointer-events:none;z-index:0}
-        .container{max-width:1100px;margin:0 auto;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:24px;padding:32px 36px;backdrop-filter:blur(10px);position:relative;z-index:1;transition:all 0.4s ease}
-        .container:hover{border-color:rgba(124,58,237,0.08)}
+        .container{max-width:1200px;margin:0 auto;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:24px;padding:32px 36px;backdrop-filter:blur(10px);position:relative;z-index:1}
         .header{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.04);margin-bottom:28px;flex-wrap:wrap;gap:12px}
         .header h1{font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,#7c3aed 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
         .header a{color:#666688;text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.3s}
@@ -27,30 +26,43 @@
         .stat-card .label{color:#666688;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px}
         .users-table{overflow-x:auto}
         .users-table h2{color:#a78bfa;font-size:1rem;font-weight:700;margin-bottom:12px}
-        table{width:100%;border-collapse:collapse;font-size:0.85rem}
-        th{text-align:left;padding:12px 10px;color:#a78bfa;border-bottom:1px solid rgba(255,255,255,0.06);font-weight:600}
-        td{padding:12px 10px;border-bottom:1px solid rgba(255,255,255,0.03);color:#c8c8e8}
-        .ip-badge{background:rgba(255,255,255,0.04);padding:2px 12px;border-radius:20px;font-size:0.7rem;font-weight:500;font-family:monospace;color:#8888aa;border:1px solid rgba(255,255,255,0.04)}
-        .plan-select{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 12px;color:#e8e8e8;font-size:0.8rem;font-family:inherit;transition:all 0.3s ease}
-        .plan-select:focus{outline:none;border-color:rgba(124,58,237,0.3)}
-        .plan-select option{background:#1a1a2e;color:#e8e8e8}
-        .btn-save{background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);color:#fff;border:none;padding:6px 18px;border-radius:6px;cursor:pointer;font-size:0.75rem;font-weight:600;transition:all 0.3s ease;font-family:inherit;margin-left:8px}
+        table{width:100%;border-collapse:collapse;font-size:0.8rem}
+        th{text-align:left;padding:10px 8px;color:#a78bfa;border-bottom:1px solid rgba(255,255,255,0.06);font-weight:600}
+        td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,0.03);color:#c8c8e8;vertical-align:middle}
+        .ip-badge{background:rgba(255,255,255,0.04);padding:2px 12px;border-radius:20px;font-size:0.65rem;font-weight:500;font-family:monospace;color:#8888aa;border:1px solid rgba(255,255,255,0.04)}
+        .role-badge{padding:2px 12px;border-radius:20px;font-size:0.6rem;font-weight:600;text-transform:uppercase;display:inline-block}
+        .role-badge.user{background:rgba(255,255,255,0.04);color:#666688;border:1px solid rgba(255,255,255,0.04)}
+        .role-badge.mod{background:rgba(124,58,237,0.15);color:#a78bfa;border:1px solid rgba(124,58,237,0.1)}
+        .role-badge.admin{background:rgba(241,196,15,0.15);color:#f1c40f;border:1px solid rgba(241,196,15,0.1)}
+        .plan-select,.role-select{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:4px 10px;color:#e8e8e8;font-size:0.75rem;font-family:inherit;transition:all 0.3s ease}
+        .plan-select:focus,.role-select:focus{outline:none;border-color:rgba(124,58,237,0.3)}
+        .plan-select option,.role-select option{background:#1a1a2e;color:#e8e8e8}
+        .btn-save{background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);color:#fff;border:none;padding:4px 14px;border-radius:6px;cursor:pointer;font-size:0.7rem;font-weight:600;transition:all 0.3s ease;font-family:inherit}
         .btn-save:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(124,58,237,0.25)}
+        .btn-delete{background:rgba(231,76,94,0.1);color:#e74c5e;border:1px solid rgba(231,76,94,0.15);padding:4px 14px;border-radius:6px;cursor:pointer;font-size:0.7rem;font-weight:600;transition:all 0.3s ease;font-family:inherit}
+        .btn-delete:hover{background:rgba(231,76,94,0.2);border-color:rgba(231,76,94,0.3)}
+        .btn-blacklist{background:rgba(231,76,94,0.08);color:#e74c5e;border:1px solid rgba(231,76,94,0.1);padding:4px 14px;border-radius:6px;cursor:pointer;font-size:0.7rem;font-weight:600;transition:all 0.3s ease;font-family:inherit}
+        .btn-blacklist:hover{background:rgba(231,76,94,0.15);border-color:rgba(231,76,94,0.2)}
+        .btn-unblacklist{background:rgba(78,255,106,0.08);color:#4eff6a;border:1px solid rgba(78,255,106,0.1);padding:4px 14px;border-radius:6px;cursor:pointer;font-size:0.7rem;font-weight:600;transition:all 0.3s ease;font-family:inherit}
+        .btn-unblacklist:hover{background:rgba(78,255,106,0.15);border-color:rgba(78,255,106,0.2)}
         .search-box{width:100%;padding:10px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;color:#e8e8e8;font-size:0.9rem;font-family:inherit;margin-bottom:16px;transition:all 0.3s ease}
         .search-box:focus{outline:none;border-color:rgba(124,58,237,0.2)}
         .search-box::placeholder{color:#333355}
         .empty{color:#444466;text-align:center;padding:30px;font-size:0.9rem}
-        .status-badge{padding:2px 12px;border-radius:20px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;display:inline-block}
+        .action-cell{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+        .status-badge{padding:2px 12px;border-radius:20px;font-size:0.6rem;font-weight:600;text-transform:uppercase;display:inline-block}
         .status-badge.free{background:rgba(255,255,255,0.04);color:#666688;border:1px solid rgba(255,255,255,0.04)}
         .status-badge.pro{background:rgba(124,58,237,0.15);color:#a78bfa;border:1px solid rgba(124,58,237,0.1)}
         .status-badge.elite{background:rgba(124,58,237,0.15);color:#a78bfa;border:1px solid rgba(124,58,237,0.1)}
         .status-badge.lifetime{background:rgba(241,196,15,0.1);color:#f1c40f;border:1px solid rgba(241,196,15,0.1)}
-        .action-cell{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
         .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);padding:14px 28px;border-radius:12px;font-weight:600;z-index:999;display:none;font-family:'Inter',sans-serif;backdrop-filter:blur(10px)}
         .toast.success{background:rgba(78,255,106,0.1);border:1px solid rgba(78,255,106,0.2);color:#4eff6a}
         .toast.error{background:rgba(231,76,94,0.1);border:1px solid rgba(231,76,94,0.2);color:#e74c5e}
+        .toast.info{background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);color:#a78bfa}
         .toast.show{display:block;animation:slideUp 0.4s ease}
         @keyframes slideUp{0%{opacity:0;transform:translateX(-50%) translateY(20px)}100%{opacity:1;transform:translateX(-50%) translateY(0)}}
+        .blacklisted-true{color:#e74c5e;font-weight:600}
+        .blacklisted-false{color:#4eff6a}
     </style>
 </head>
 <body>
@@ -85,19 +97,25 @@
         if(!token)window.location.href='admin-login.html';
         let allUsers=[];
 
-        function showToast(message,type='success'){const t=document.getElementById('toast');t.textContent=message;t.className='toast '+type+' show';setTimeout(()=>{t.classList.remove('show')},3000)}
+        function showToast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';setTimeout(()=>t.classList.remove('show'),3500)}
 
-        async function loadStats(){try{const r=await fetch(API_URL+'/api/admin/stats',{headers:{'Authorization':'Bearer '+token}});const d=await r.json();document.getElementById('totalUsers').textContent=d.totalUsers||0;document.getElementById('totalDeployments').textContent=d.totalDeployments||0;document.getElementById('activeDeployments').textContent=d.activeDeployments||0;document.getElementById('totalVisits').textContent=d.totalVisits||0}catch(e){console.error(e)}}
+        async function loadStats(){try{const r=await fetch(API_URL+'/api/admin/stats',{headers:{'Authorization':'Bearer '+token}});const d=await r.json();document.getElementById('totalUsers').textContent=d.totalUsers||0;document.getElementById('totalDeployments').textContent=d.totalDeployments||0;document.getElementById('activeDeployments').textContent=d.activeDeployments||0;document.getElementById('totalVisits').textContent=d.totalVisits||0}catch(e){}}
 
-        async function loadUsers(){try{const r=await fetch(API_URL+'/api/admin/users',{headers:{'Authorization':'Bearer '+token}});const d=await r.json();allUsers=d.users||[];renderUsers(allUsers);loadStats()}catch(e){console.error(e)}}
+        async function loadUsers(){try{const r=await fetch(API_URL+'/api/admin/users',{headers:{'Authorization':'Bearer '+token}});const d=await r.json();allUsers=d.users||[];renderUsers(allUsers);loadStats()}catch(e){}}
 
         function renderUsers(users){const list=document.getElementById('usersList');if(!users||users.length===0){list.innerHTML='<div class="empty">No users found</div>';return}
-        let html=`<table><tr><th>Email</th><th>Discord</th><th>IP</th><th>Plan</th><th>Deploys</th><th>Visits</th><th>Action</th></tr>`;
-        users.forEach(u=>{const ip=u.lastIp||'-';const visits=u.totalVisits||0;html+=`<tr><td>${u.email}</td><td><strong>${u.discord||'-'}</strong></td><td><span class="ip-badge">${ip}</span></td><td><span class="status-badge ${u.plan}">${u.plan.toUpperCase()}</span></td><td>${u.dailyDeploys||0}</td><td>${visits}</td><td><div class="action-cell"><select class="plan-select" data-userid="${u.id}" id="plan-${u.id}"><option value="free" ${u.plan==='free'?'selected':''}>Free</option><option value="pro" ${u.plan==='pro'?'selected':''}>Pro</option><option value="elite" ${u.plan==='elite'?'selected':''}>Elite</option><option value="lifetime" ${u.plan==='lifetime'?'selected':''}>Lifetime</option></select><button class="btn-save" onclick="updatePlan('${u.id}')">Save</button></div></td></tr>`});html+='</table>';list.innerHTML=html}
+        let html=`<table><tr><th>Email</th><th>Discord</th><th>IP</th><th>Role</th><th>Plan</th><th>Deploys</th><th>Visits</th><th>Blacklisted</th><th>Action</th></tr>`;
+        users.forEach(u=>{const ip=u.lastIp||'-';const visits=u.totalVisits||0;const bl=u.blacklisted||false;html+=`<tr><td>${u.email}</td><td><strong>${u.discord||'-'}</strong></td><td><span class="ip-badge">${ip}</span></td><td><span class="role-badge ${u.role||'user'}">${(u.role||'user').toUpperCase()}</span></td><td><span class="status-badge ${u.plan}">${u.plan.toUpperCase()}</span></td><td>${u.dailyDeploys||0}</td><td>${visits}</td><td class="${bl?'blacklisted-true':'blacklisted-false'}">${bl?'⚠️ YES':'✅ NO'}</td><td><div class="action-cell"><select class="plan-select" data-userid="${u.id}" id="plan-${u.id}"><option value="free" ${u.plan==='free'?'selected':''}>Free</option><option value="pro" ${u.plan==='pro'?'selected':''}>Pro</option><option value="elite" ${u.plan==='elite'?'selected':''}>Elite</option><option value="lifetime" ${u.plan==='lifetime'?'selected':''}>Lifetime</option></select><select class="role-select" data-userid="${u.id}" id="role-${u.id}"><option value="user" ${(u.role||'user')==='user'?'selected':''}>User</option><option value="mod" ${u.role==='mod'?'selected':''}>Mod</option><option value="admin" ${u.role==='admin'?'selected':''}>Admin</option></select><button class="btn-save" onclick="updateUser('${u.id}')">Save</button>${bl?`<button class="btn-unblacklist" onclick="unblacklistUser('${u.id}')">Unblacklist</button>`:`<button class="btn-blacklist" onclick="blacklistUser('${u.id}')">Blacklist</button>`}<button class="btn-delete" onclick="deleteUser('${u.id}')">Delete</button></div></td></tr>`});html+='</table>';list.innerHTML=html}
 
         function filterUsers(){const s=document.getElementById('searchInput').value.toLowerCase();const f=allUsers.filter(u=>u.email.toLowerCase().includes(s)||(u.discord&&u.discord.toLowerCase().includes(s)));renderUsers(f)}
 
-        window.updatePlan=async(userId)=>{const select=document.getElementById('plan-'+userId);const plan=select.value;try{const r=await fetch(API_URL+'/api/admin/user/'+userId+'/plan',{method:'PUT',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({plan})});const d=await r.json();if(r.ok){showToast('✅ Plan updated to '+plan.toUpperCase(),'success');loadUsers()}else{showToast('❌ '+(d.error||'Update failed'),'error')}}catch(e){showToast('❌ Network error','error')}};
+        window.updateUser=async(userId)=>{const plan=document.getElementById('plan-'+userId).value;const role=document.getElementById('role-'+userId).value;try{const r=await fetch(API_URL+'/api/admin/user/'+userId+'/plan',{method:'PUT',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({plan})});if(!r.ok){const d=await r.json();showToast('❌ '+d.error,'error');return}const r2=await fetch(API_URL+'/api/admin/user/'+userId+'/role',{method:'PUT',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({role})});if(r2.ok){showToast('✅ User updated!','success');loadUsers()}else{const d=await r2.json();showToast('❌ '+d.error,'error')}}catch(e){showToast('❌ Network error','error')}};
+
+        window.deleteUser=async(userId)=>{if(!confirm('⚠️ Delete this user and all their data?'))return;try{const r=await fetch(API_URL+'/api/admin/user/'+userId,{method:'DELETE',headers:{'Authorization':'Bearer '+token}});if(r.ok){showToast('✅ User deleted','success');loadUsers()}else{const d=await r.json();showToast('❌ '+d.error,'error')}}catch(e){showToast('❌ Network error','error')}};
+
+        window.blacklistUser=async(userId)=>{if(!confirm('⚠️ Blacklist this user? They cannot login/register.'))return;try{const u=allUsers.find(x=>x.id===userId);if(!u)return;const r=await fetch(API_URL+'/api/admin/blacklist',{method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({ip:u.lastIp})});if(r.ok){showToast('✅ User blacklisted','success');loadUsers()}else{const d=await r.json();showToast('❌ '+d.error,'error')}}catch(e){showToast('❌ Network error','error')}};
+
+        window.unblacklistUser=async(userId)=>{if(!confirm('Remove this user from blacklist?'))return;try{const r=await fetch(API_URL+'/api/admin/blacklist/'+userId,{method:'DELETE',headers:{'Authorization':'Bearer '+token}});if(r.ok){showToast('✅ User unblacklisted','success');loadUsers()}else{const d=await r.json();showToast('❌ '+d.error,'error')}}catch(e){showToast('❌ Network error','error')}};
 
         function logout(){localStorage.removeItem('adminToken');window.location.href='admin-login.html'}
 
