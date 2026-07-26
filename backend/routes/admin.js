@@ -4,15 +4,22 @@ const User = require('../models/User');
 const Deployment = require('../models/Deployment');
 const router = express.Router();
 
+// ===== ADMIN LOGIN =====
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  if (username !== process.env.ADMIN_USERNAME || password !== process.env.ADMIN_PASSWORD) {
-    return res.status(401).json({ error: 'Invalid admin credentials' });
+  try {
+    const { username, password } = req.body;
+    if (username !== process.env.ADMIN_USERNAME || password !== process.env.ADMIN_PASSWORD) {
+      return res.status(401).json({ error: 'Invalid admin credentials' });
+    }
+    const token = jwt.sign({ admin: true }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    res.json({ token });
+  } catch (error) {
+    console.error('Admin login error:', error);
+    res.status(500).json({ error: 'Server error' });
   }
-  const token = jwt.sign({ admin: true }, process.env.JWT_SECRET, { expiresIn: '24h' });
-  res.json({ token });
 });
 
+// ===== GET ALL USERS =====
 router.get('/users', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -40,6 +47,7 @@ router.get('/users', async (req, res) => {
   }
 });
 
+// ===== UPDATE USER PLAN =====
 router.put('/user/:userId/plan', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -54,16 +62,31 @@ router.put('/user/:userId/plan', async (req, res) => {
       return res.status(400).json({ error: 'Invalid plan' });
     }
     
-    const user = await User.findByIdAndUpdate(userId, { plan }, { new: true });
-    if (!user) return res.status(404).json({ error: 'User not found' });
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
     
-    res.json({ success: true, user: { id: user._id, email: user.email, plan: user.plan, discord: user.discord, lastIp: user.lastIp } });
+    user.plan = plan;
+    await user.save();
+    
+    res.json({ 
+      success: true, 
+      user: { 
+        id: user._id, 
+        email: user.email, 
+        plan: user.plan, 
+        discord: user.discord,
+        lastIp: user.lastIp 
+      } 
+    });
   } catch (error) {
     console.error('Error updating plan:', error);
     res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
 
+// ===== GET STATS =====
 router.get('/stats', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
