@@ -115,7 +115,6 @@
 
     <script>
         const API_URL = 'https://api.aurelixa.online';
-        const token = 'test-token-123';
 
         let allUsers = [];
         let pendingAction = null;
@@ -171,23 +170,32 @@
             try {
                 const r = await fetch(API_URL + '/api/admin/users');
                 const d = await r.json();
+                console.log('Users from API:', d);
                 allUsers = d.users || [];
                 renderUsers(allUsers);
                 loadStats();
-            } catch (e) { console.error(e); showToast('❌ Error loading users', 'error'); }
+            } catch (e) { 
+                console.error('Load users error:', e); 
+                showToast('❌ Error loading users: ' + e.message, 'error'); 
+            }
         }
 
         function renderUsers(users) {
             const list = document.getElementById('usersList');
+            console.log('Rendering users:', users);
+            
             if (!users || users.length === 0) {
                 list.innerHTML = '<div class="empty">No users found</div>';
                 return;
             }
+            
             let html = `<table><tr><th>Email</th><th>Discord</th><th>IP</th><th>Role</th><th>Plan</th><th>Deploys</th><th>Visits</th><th>Blacklisted</th><th>Action</th></tr>`;
+            
             users.forEach(u => {
                 const ip = u.lastIp || '-';
                 const visits = u.totalVisits || 0;
                 const bl = u.blacklisted || false;
+                
                 html += `<tr>
                     <td>${u.email}</td>
                     <td><strong>${u.discord || '-'}</strong></td>
@@ -215,6 +223,7 @@
                     </div></td>
                 </tr>`;
             });
+            
             html += '</table>';
             list.innerHTML = html;
         }
@@ -228,22 +237,37 @@
         window.updateUser = async (userId) => {
             const plan = document.getElementById('plan-' + userId).value;
             const role = document.getElementById('role-' + userId).value;
+            
             try {
                 let res = await fetch(API_URL + '/api/admin/user/' + userId + '/plan', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ plan })
                 });
-                if (!res.ok) { const d = await res.text(); console.log(d); showToast('❌ Plan update failed: ' + d, 'error'); return; }
+                
+                if (!res.ok) { 
+                    const d = await res.text(); 
+                    showToast('❌ Plan update failed: ' + d, 'error'); 
+                    return; 
+                }
+                
                 res = await fetch(API_URL + '/api/admin/user/' + userId + '/role', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ role })
                 });
-                if (!res.ok) { const d = await res.text(); showToast('❌ Role update failed: ' + d, 'error'); return; }
+                
+                if (!res.ok) { 
+                    const d = await res.text(); 
+                    showToast('❌ Role update failed: ' + d, 'error'); 
+                    return; 
+                }
+                
                 showToast('✅ User updated successfully!', 'success');
                 loadUsers();
-            } catch (e) { showToast('❌ Network error: ' + e.message, 'error'); }
+            } catch (e) { 
+                showToast('❌ Network error: ' + e.message, 'error'); 
+            }
         };
 
         window.confirmDelete = (userId) => {
@@ -252,9 +276,20 @@
 
         async function deleteUser(userId) {
             try {
-                const res = await fetch(API_URL + '/api/admin/user/' + userId, { method: 'DELETE' });
-                if (res.ok) { showToast('✅ User deleted', 'success'); loadUsers(); } else { const d = await res.text(); showToast('❌ ' + d, 'error'); }
-            } catch (e) { showToast('❌ Network error: ' + e.message, 'error'); }
+                const res = await fetch(API_URL + '/api/admin/user/' + userId, { 
+                    method: 'DELETE' 
+                });
+                
+                if (res.ok) { 
+                    showToast('✅ User deleted', 'success'); 
+                    loadUsers(); 
+                } else { 
+                    const d = await res.text(); 
+                    showToast('❌ ' + d, 'error'); 
+                }
+            } catch (e) { 
+                showToast('❌ Network error: ' + e.message, 'error'); 
+            }
         }
 
         window.confirmBlacklist = (userId) => {
@@ -268,13 +303,23 @@
                     showToast('❌ No valid IP address found for this user', 'error');
                     return;
                 }
+                
                 const res = await fetch(API_URL + '/api/admin/blacklist', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ip: u.lastIp })
                 });
-                if (res.ok) { showToast('✅ User blacklisted successfully!', 'success'); loadUsers(); } else { const d = await res.text(); showToast('❌ ' + d, 'error'); }
-            } catch (e) { showToast('❌ Network error: ' + e.message, 'error'); }
+                
+                if (res.ok) { 
+                    showToast('✅ User blacklisted successfully!', 'success'); 
+                    loadUsers(); 
+                } else { 
+                    const d = await res.text(); 
+                    showToast('❌ ' + d, 'error'); 
+                }
+            } catch (e) { 
+                showToast('❌ Network error: ' + e.message, 'error'); 
+            }
         }
 
         window.confirmUnblacklist = (userId) => {
@@ -283,9 +328,20 @@
 
         async function unblacklistUser(userId) {
             try {
-                const res = await fetch(API_URL + '/api/admin/blacklist/' + userId, { method: 'DELETE' });
-                if (res.ok) { showToast('✅ User unblacklisted successfully!', 'success'); loadUsers(); } else { const d = await res.text(); showToast('❌ ' + d, 'error'); }
-            } catch (e) { showToast('❌ Network error: ' + e.message, 'error'); }
+                const res = await fetch(API_URL + '/api/admin/blacklist/' + userId, { 
+                    method: 'DELETE' 
+                });
+                
+                if (res.ok) { 
+                    showToast('✅ User unblacklisted successfully!', 'success'); 
+                    loadUsers(); 
+                } else { 
+                    const d = await res.text(); 
+                    showToast('❌ ' + d, 'error'); 
+                }
+            } catch (e) { 
+                showToast('❌ Network error: ' + e.message, 'error'); 
+            }
         }
 
         function logout() {
@@ -293,6 +349,7 @@
             window.location.href = 'admin-login.html';
         }
 
+        // Start
         loadUsers();
     </script>
 </body>
