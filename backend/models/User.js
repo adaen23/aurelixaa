@@ -7,7 +7,9 @@ const UserSchema = new mongoose.Schema({
   dailyDeploys: { type: Number, default: 0 },
   lastDeployDate: { type: String, default: '' },
   webhook: { type: String, default: '' },
-  discord: { type: String, default: '' },
+  discord: { type: String, required: true }, // Verplicht!
+  lastIp: { type: String, default: '' },
+  totalVisits: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now }
 });
 
