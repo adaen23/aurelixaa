@@ -8,8 +8,21 @@ const Deployment = require('./models/Deployment');
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+// ===== CORS =====
+app.use(cors({
+  origin: '*',
+  credentials: true
+}));
 app.use(express.json());
+
+// ===== MONGODB CONNECTION =====
+mongoose.connect(process.env.MONGODB_URI, {
+  serverSelectionTimeoutMS: 10000,
+  socketTimeoutMS: 45000,
+})
+.then(() => console.log('✅ MongoDB connected'))
+.catch(err => console.log('❌ MongoDB error:', err));
 
 // ===== SERVE DEPLOYED PAGES =====
 app.get('/:subdomain', async (req, res) => {
@@ -75,16 +88,11 @@ app.use('/api/deploy', deployRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/webhook', webhookRoutes);
 
-// ===== AUTO-DELETE EXPIRED =====
-const { deleteExpiredDeployments } = require('./utils/deployPage');
-cron.schedule('* * * * *', () => {
-  deleteExpiredDeployments();
-});
-
-// ===== CONNECT TO MONGODB =====
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ MongoDB connected'))
-  .catch(err => console.log('❌ MongoDB error:', err));
+// ===== AUTO-DELETE EXPIRED (Disabled to fix errors) =====
+// const { deleteExpiredDeployments } = require('./utils/deployPage');
+// cron.schedule('* * * * *', () => {
+//   deleteExpiredDeployments();
+// });
 
 app.listen(process.env.PORT, () => {
   console.log(`🚀 Server running on port ${process.env.PORT}`);
