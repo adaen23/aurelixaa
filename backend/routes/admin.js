@@ -3,8 +3,6 @@ const User = require('../models/User');
 const Deployment = require('../models/Deployment');
 const router = express.Router();
 
-console.log('✅ Admin routes loaded!');
-
 // ===== ADMIN LOGIN =====
 router.post('/login', (req, res) => {
   const { username, password } = req.body;
@@ -14,7 +12,7 @@ router.post('/login', (req, res) => {
   res.status(401).json({ error: 'Invalid credentials' });
 });
 
-// ===== GET ALL USERS =====
+// ===== GET ALL USERS (GEEN TOKEN NODIG) =====
 router.get('/users', async (req, res) => {
   try {
     const users = await User.find({}).select('-password');
@@ -24,7 +22,7 @@ router.get('/users', async (req, res) => {
   }
 });
 
-// ===== UPDATE PLAN =====
+// ===== UPDATE PLAN (GEEN TOKEN NODIG) =====
 router.put('/user/:userId/plan', async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
@@ -37,7 +35,7 @@ router.put('/user/:userId/plan', async (req, res) => {
   }
 });
 
-// ===== UPDATE ROLE =====
+// ===== UPDATE ROLE (GEEN TOKEN NODIG) =====
 router.put('/user/:userId/role', async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
@@ -50,7 +48,7 @@ router.put('/user/:userId/role', async (req, res) => {
   }
 });
 
-// ===== DELETE USER =====
+// ===== DELETE USER (GEEN TOKEN NODIG) =====
 router.delete('/user/:userId', async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.userId);
@@ -62,7 +60,7 @@ router.delete('/user/:userId', async (req, res) => {
   }
 });
 
-// ===== BLACKLIST =====
+// ===== BLACKLIST (GEEN TOKEN NODIG) =====
 router.post('/blacklist', async (req, res) => {
   try {
     const { ip } = req.body;
@@ -80,7 +78,7 @@ router.post('/blacklist', async (req, res) => {
   }
 });
 
-// ===== UNBLACKLIST =====
+// ===== UNBLACKLIST (GEEN TOKEN NODIG) =====
 router.delete('/blacklist/:userId', async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
@@ -93,7 +91,7 @@ router.delete('/blacklist/:userId', async (req, res) => {
   }
 });
 
-// ===== STATS =====
+// ===== STATS (GEEN TOKEN NODIG) =====
 router.get('/stats', async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
