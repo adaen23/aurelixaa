@@ -4,7 +4,6 @@ const User = require('../models/User');
 const Deployment = require('../models/Deployment');
 const router = express.Router();
 
-// ===== ADMIN LOGIN =====
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -18,13 +17,12 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// ===== GET ALL USERS (Admin + Mod) =====
 router.get('/users', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) return res.status(401).json({ error: 'Unauthorized' });
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.admin && !decoded.mod) return res.status(403).json({ error: 'Admin or Mod only' });
+    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
     
     const users = await User.find({}).select('-password');
     const usersWithStats = await Promise.all(users.map(async (user) => {
@@ -40,13 +38,12 @@ router.get('/users', async (req, res) => {
   }
 });
 
-// ===== UPDATE USER PLAN (Admin + Mod) =====
 router.put('/user/:userId/plan', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) return res.status(401).json({ error: 'Unauthorized' });
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.admin && !decoded.mod) return res.status(403).json({ error: 'Admin or Mod only' });
+    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
     
     const { userId } = req.params;
     const { plan } = req.body;
@@ -61,13 +58,12 @@ router.put('/user/:userId/plan', async (req, res) => {
     user.plan = plan;
     await user.save();
     
-    res.json({ success: true, user: { id: user._id, email: user.email, plan: user.plan, discord: user.discord, lastIp: user.lastIp, role: user.role } });
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-// ===== UPDATE USER ROLE (Admin only) =====
 router.put('/user/:userId/role', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -88,13 +84,12 @@ router.put('/user/:userId/role', async (req, res) => {
     user.role = role;
     await user.save();
     
-    res.json({ success: true, user: { id: user._id, email: user.email, role: user.role } });
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-// ===== DELETE USER (Admin only) =====
 router.delete('/user/:userId', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -103,21 +98,16 @@ router.delete('/user/:userId', async (req, res) => {
     if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
     
     const { userId } = req.params;
-    
-    // Delete user
     const user = await User.findByIdAndDelete(userId);
     if (!user) return res.status(404).json({ error: 'User not found' });
     
-    // Delete all their deployments
     await Deployment.deleteMany({ userId });
-    
-    res.json({ success: true, message: 'User and all deployments deleted' });
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-// ===== BLACKLIST IP (Admin only) =====
 router.post('/blacklist', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -128,7 +118,6 @@ router.post('/blacklist', async (req, res) => {
     const { ip } = req.body;
     if (!ip) return res.status(400).json({ error: 'IP is required' });
     
-    // Find all users with this IP and blacklist them
     const users = await User.find({ lastIp: ip });
     for (const user of users) {
       user.blacklisted = true;
@@ -141,7 +130,6 @@ router.post('/blacklist', async (req, res) => {
   }
 });
 
-// ===== REMOVE BLACKLIST (Admin only) =====
 router.delete('/blacklist/:userId', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -156,19 +144,18 @@ router.delete('/blacklist/:userId', async (req, res) => {
     user.blacklisted = false;
     await user.save();
     
-    res.json({ success: true, message: 'User removed from blacklist' });
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-// ===== GET STATS =====
 router.get('/stats', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) return res.status(401).json({ error: 'Unauthorized' });
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.admin && !decoded.mod) return res.status(403).json({ error: 'Admin or Mod only' });
+    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
     
     const totalUsers = await User.countDocuments();
     const totalDeployments = await Deployment.countDocuments();
