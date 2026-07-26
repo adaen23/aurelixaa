@@ -10,17 +10,17 @@
     <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#0a0a0f;color:#e8e8e8;font-family:'Inter',sans-serif;padding:24px;min-height:100vh;position:relative}
+        body{background:#0a0a0f;color:#e8e8e8;font-family:'Inter',sans-serif;padding:20px;min-height:100vh;position:relative}
         body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(124,58,237,0.04) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(124,58,237,0.03) 0%,transparent 60%);pointer-events:none;z-index:0}
-        .container{max-width:1200px;margin:0 auto;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:24px;padding:32px 36px;backdrop-filter:blur(10px);position:relative;z-index:1}
-        .header{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.04);margin-bottom:28px;flex-wrap:wrap;gap:12px}
+        .container{max-width:1200px;margin:0 auto;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:24px;padding:28px 32px;backdrop-filter:blur(10px);position:relative;z-index:1}
+        .header{display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.04);margin-bottom:24px;flex-wrap:wrap;gap:12px}
         .header h1{font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,#7c3aed 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
         .header a{color:#666688;text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.3s}
         .header a:hover{color:#a78bfa}
         .header .btn-logout{background:transparent;color:#666688;border:1px solid rgba(255,255,255,0.06);padding:6px 18px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.8rem;font-weight:600;transition:all 0.3s ease;margin-left:12px}
         .header .btn-logout:hover{background:rgba(255,255,255,0.03);color:#a78bfa}
-        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:28px}
-        .stat-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:12px;padding:18px 16px;text-align:center;transition:all 0.3s ease}
+        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:24px}
+        .stat-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:12px;padding:16px 14px;text-align:center;transition:all 0.3s ease}
         .stat-card:hover{border-color:rgba(124,58,237,0.1);transform:translateY(-2px)}
         .stat-card .number{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#7c3aed 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
         .stat-card .label{color:#666688;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px}
@@ -45,7 +45,7 @@
         .btn-blacklist:hover{background:rgba(231,76,94,0.15);border-color:rgba(231,76,94,0.2)}
         .btn-unblacklist{background:rgba(78,255,106,0.08);color:#4eff6a;border:1px solid rgba(78,255,106,0.1);padding:4px 14px;border-radius:6px;cursor:pointer;font-size:0.7rem;font-weight:600;transition:all 0.3s ease;font-family:inherit}
         .btn-unblacklist:hover{background:rgba(78,255,106,0.15);border-color:rgba(78,255,106,0.2)}
-        .search-box{width:100%;padding:10px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;color:#e8e8e8;font-size:0.9rem;font-family:inherit;margin-bottom:16px;transition:all 0.3s ease}
+        .search-box{width:100%;padding:10px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;color:#e8e8e8;font-size:0.9rem;font-family:inherit;margin-bottom:14px;transition:all 0.3s ease}
         .search-box:focus{outline:none;border-color:rgba(124,58,237,0.2)}
         .search-box::placeholder{color:#333355}
         .empty{color:#444466;text-align:center;padding:30px;font-size:0.9rem}
@@ -92,32 +92,200 @@
     <div id="toast" class="toast"></div>
 
     <script>
-        const API_URL='https://api.aurelixa.online';
-        const token=localStorage.getItem('adminToken');
-        if(!token)window.location.href='admin-login.html';
-        let allUsers=[];
+        const API_URL = 'https://api.aurelixa.online';
+        const token = localStorage.getItem('adminToken');
+        if (!token) window.location.href = 'admin-login.html';
+        let allUsers = [];
 
-        function showToast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';setTimeout(()=>t.classList.remove('show'),3500)}
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast ' + type + ' show';
+            setTimeout(() => t.classList.remove('show'), 3500);
+        }
 
-        async function loadStats(){try{const r=await fetch(API_URL+'/api/admin/stats',{headers:{'Authorization':'Bearer '+token}});const d=await r.json();document.getElementById('totalUsers').textContent=d.totalUsers||0;document.getElementById('totalDeployments').textContent=d.totalDeployments||0;document.getElementById('activeDeployments').textContent=d.activeDeployments||0;document.getElementById('totalVisits').textContent=d.totalVisits||0}catch(e){}}
+        async function loadStats() {
+            try {
+                const r = await fetch(API_URL + '/api/admin/stats', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const d = await r.json();
+                document.getElementById('totalUsers').textContent = d.totalUsers || 0;
+                document.getElementById('totalDeployments').textContent = d.totalDeployments || 0;
+                document.getElementById('activeDeployments').textContent = d.activeDeployments || 0;
+                document.getElementById('totalVisits').textContent = d.totalVisits || 0;
+            } catch (e) {}
+        }
 
-        async function loadUsers(){try{const r=await fetch(API_URL+'/api/admin/users',{headers:{'Authorization':'Bearer '+token}});const d=await r.json();allUsers=d.users||[];renderUsers(allUsers);loadStats()}catch(e){}}
+        async function loadUsers() {
+            try {
+                const r = await fetch(API_URL + '/api/admin/users', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const d = await r.json();
+                allUsers = d.users || [];
+                renderUsers(allUsers);
+                loadStats();
+            } catch (e) {}
+        }
 
-        function renderUsers(users){const list=document.getElementById('usersList');if(!users||users.length===0){list.innerHTML='<div class="empty">No users found</div>';return}
-        let html=`<table><tr><th>Email</th><th>Discord</th><th>IP</th><th>Role</th><th>Plan</th><th>Deploys</th><th>Visits</th><th>Blacklisted</th><th>Action</th></tr>`;
-        users.forEach(u=>{const ip=u.lastIp||'-';const visits=u.totalVisits||0;const bl=u.blacklisted||false;html+=`<tr><td>${u.email}</td><td><strong>${u.discord||'-'}</strong></td><td><span class="ip-badge">${ip}</span></td><td><span class="role-badge ${u.role||'user'}">${(u.role||'user').toUpperCase()}</span></td><td><span class="status-badge ${u.plan}">${u.plan.toUpperCase()}</span></td><td>${u.dailyDeploys||0}</td><td>${visits}</td><td class="${bl?'blacklisted-true':'blacklisted-false'}">${bl?'⚠️ YES':'✅ NO'}</td><td><div class="action-cell"><select class="plan-select" data-userid="${u.id}" id="plan-${u.id}"><option value="free" ${u.plan==='free'?'selected':''}>Free</option><option value="pro" ${u.plan==='pro'?'selected':''}>Pro</option><option value="elite" ${u.plan==='elite'?'selected':''}>Elite</option><option value="lifetime" ${u.plan==='lifetime'?'selected':''}>Lifetime</option></select><select class="role-select" data-userid="${u.id}" id="role-${u.id}"><option value="user" ${(u.role||'user')==='user'?'selected':''}>User</option><option value="mod" ${u.role==='mod'?'selected':''}>Mod</option><option value="admin" ${u.role==='admin'?'selected':''}>Admin</option></select><button class="btn-save" onclick="updateUser('${u.id}')">Save</button>${bl?`<button class="btn-unblacklist" onclick="unblacklistUser('${u.id}')">Unblacklist</button>`:`<button class="btn-blacklist" onclick="blacklistUser('${u.id}')">Blacklist</button>`}<button class="btn-delete" onclick="deleteUser('${u.id}')">Delete</button></div></td></tr>`});html+='</table>';list.innerHTML=html}
+        function renderUsers(users) {
+            const list = document.getElementById('usersList');
+            if (!users || users.length === 0) {
+                list.innerHTML = '<div class="empty">No users found</div>';
+                return;
+            }
+            let html = `<table><tr><th>Email</th><th>Discord</th><th>IP</th><th>Role</th><th>Plan</th><th>Deploys</th><th>Visits</th><th>Blacklisted</th><th>Action</th></tr>`;
+            users.forEach(u => {
+                const ip = u.lastIp || '-';
+                const visits = u.totalVisits || 0;
+                const bl = u.blacklisted || false;
+                html += `<tr>
+                    <td>${u.email}</td>
+                    <td><strong>${u.discord || '-'}</strong></td>
+                    <td><span class="ip-badge">${ip}</span></td>
+                    <td><span class="role-badge ${u.role || 'user'}">${(u.role || 'user').toUpperCase()}</span></td>
+                    <td><span class="status-badge ${u.plan}">${u.plan.toUpperCase()}</span></td>
+                    <td>${u.dailyDeploys || 0}</td>
+                    <td>${visits}</td>
+                    <td class="${bl ? 'blacklisted-true' : 'blacklisted-false'}">${bl ? '⚠️ YES' : '✅ NO'}</td>
+                    <td><div class="action-cell">
+                        <select class="plan-select" id="plan-${u.id}">
+                            <option value="free" ${u.plan === 'free' ? 'selected' : ''}>Free</option>
+                            <option value="pro" ${u.plan === 'pro' ? 'selected' : ''}>Pro</option>
+                            <option value="elite" ${u.plan === 'elite' ? 'selected' : ''}>Elite</option>
+                            <option value="lifetime" ${u.plan === 'lifetime' ? 'selected' : ''}>Lifetime</option>
+                        </select>
+                        <select class="role-select" id="role-${u.id}">
+                            <option value="user" ${(u.role || 'user') === 'user' ? 'selected' : ''}>User</option>
+                            <option value="mod" ${u.role === 'mod' ? 'selected' : ''}>Mod</option>
+                            <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
+                        </select>
+                        <button class="btn-save" onclick="updateUser('${u.id}')">Save</button>
+                        ${bl ? `<button class="btn-unblacklist" onclick="unblacklistUser('${u.id}')">Unblacklist</button>` : `<button class="btn-blacklist" onclick="blacklistUser('${u.id}')">Blacklist</button>`}
+                        <button class="btn-delete" onclick="deleteUser('${u.id}')">Delete</button>
+                    </div></td>
+                </tr>`;
+            });
+            html += '</table>';
+            list.innerHTML = html;
+        }
 
-        function filterUsers(){const s=document.getElementById('searchInput').value.toLowerCase();const f=allUsers.filter(u=>u.email.toLowerCase().includes(s)||(u.discord&&u.discord.toLowerCase().includes(s)));renderUsers(f)}
+        function filterUsers() {
+            const s = document.getElementById('searchInput').value.toLowerCase();
+            const f = allUsers.filter(u => u.email.toLowerCase().includes(s) || (u.discord && u.discord.toLowerCase().includes(s)));
+            renderUsers(f);
+        }
 
-        window.updateUser=async(userId)=>{const plan=document.getElementById('plan-'+userId).value;const role=document.getElementById('role-'+userId).value;try{const r=await fetch(API_URL+'/api/admin/user/'+userId+'/plan',{method:'PUT',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({plan})});if(!r.ok){const d=await r.json();showToast('❌ '+d.error,'error');return}const r2=await fetch(API_URL+'/api/admin/user/'+userId+'/role',{method:'PUT',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({role})});if(r2.ok){showToast('✅ User updated!','success');loadUsers()}else{const d=await r2.json();showToast('❌ '+d.error,'error')}}catch(e){showToast('❌ Network error','error')}};
+        window.updateUser = async (userId) => {
+            const plan = document.getElementById('plan-' + userId).value;
+            const role = document.getElementById('role-' + userId).value;
+            
+            try {
+                // Update plan
+                let res = await fetch(API_URL + '/api/admin/user/' + userId + '/plan', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ plan })
+                });
+                if (!res.ok) {
+                    const d = await res.json();
+                    showToast('❌ Plan update failed: ' + d.error, 'error');
+                    return;
+                }
+                
+                // Update role
+                res = await fetch(API_URL + '/api/admin/user/' + userId + '/role', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ role })
+                });
+                if (!res.ok) {
+                    const d = await res.json();
+                    showToast('❌ Role update failed: ' + d.error, 'error');
+                    return;
+                }
+                
+                showToast('✅ User updated successfully!', 'success');
+                loadUsers();
+            } catch (e) {
+                showToast('❌ Network error', 'error');
+            }
+        };
 
-        window.deleteUser=async(userId)=>{if(!confirm('⚠️ Delete this user and all their data?'))return;try{const r=await fetch(API_URL+'/api/admin/user/'+userId,{method:'DELETE',headers:{'Authorization':'Bearer '+token}});if(r.ok){showToast('✅ User deleted','success');loadUsers()}else{const d=await r.json();showToast('❌ '+d.error,'error')}}catch(e){showToast('❌ Network error','error')}};
+        window.deleteUser = async (userId) => {
+            if (!confirm('⚠️ Delete this user and all their data?')) return;
+            try {
+                const res = await fetch(API_URL + '/api/admin/user/' + userId, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    showToast('✅ User deleted', 'success');
+                    loadUsers();
+                } else {
+                    const d = await res.json();
+                    showToast('❌ ' + d.error, 'error');
+                }
+            } catch (e) {
+                showToast('❌ Network error', 'error');
+            }
+        };
 
-        window.blacklistUser=async(userId)=>{if(!confirm('⚠️ Blacklist this user? They cannot login/register.'))return;try{const u=allUsers.find(x=>x.id===userId);if(!u)return;const r=await fetch(API_URL+'/api/admin/blacklist',{method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({ip:u.lastIp})});if(r.ok){showToast('✅ User blacklisted','success');loadUsers()}else{const d=await r.json();showToast('❌ '+d.error,'error')}}catch(e){showToast('❌ Network error','error')}};
+        window.blacklistUser = async (userId) => {
+            if (!confirm('⚠️ Blacklist this user? They cannot login/register.')) return;
+            try {
+                const u = allUsers.find(x => x.id === userId);
+                if (!u) return;
+                const res = await fetch(API_URL + '/api/admin/blacklist', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ ip: u.lastIp })
+                });
+                if (res.ok) {
+                    showToast('✅ User blacklisted', 'success');
+                    loadUsers();
+                } else {
+                    const d = await res.json();
+                    showToast('❌ ' + d.error, 'error');
+                }
+            } catch (e) {
+                showToast('❌ Network error', 'error');
+            }
+        };
 
-        window.unblacklistUser=async(userId)=>{if(!confirm('Remove this user from blacklist?'))return;try{const r=await fetch(API_URL+'/api/admin/blacklist/'+userId,{method:'DELETE',headers:{'Authorization':'Bearer '+token}});if(r.ok){showToast('✅ User unblacklisted','success');loadUsers()}else{const d=await r.json();showToast('❌ '+d.error,'error')}}catch(e){showToast('❌ Network error','error')}};
+        window.unblacklistUser = async (userId) => {
+            if (!confirm('Remove this user from blacklist?')) return;
+            try {
+                const res = await fetch(API_URL + '/api/admin/blacklist/' + userId, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    showToast('✅ User unblacklisted', 'success');
+                    loadUsers();
+                } else {
+                    const d = await res.json();
+                    showToast('❌ ' + d.error, 'error');
+                }
+            } catch (e) {
+                showToast('❌ Network error', 'error');
+            }
+        };
 
-        function logout(){localStorage.removeItem('adminToken');window.location.href='admin-login.html'}
+        function logout() {
+            localStorage.removeItem('adminToken');
+            window.location.href = 'admin-login.html';
+        }
 
         loadUsers();
     </script>
