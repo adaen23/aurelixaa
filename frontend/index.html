@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AURELIXA</title>
+    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{background:#0a0e1a;min-height:100vh;display:flex;justify-content:center;align-items:center;font-family:'Segoe UI',sans-serif;padding:20px}
@@ -20,6 +21,9 @@
         .footer{color:#4a5a6a;font-size:0.8rem;margin-top:25px;padding-top:20px;border-top:1px solid #0d1a2a}
         .footer a{color:#4a9eff;text-decoration:none}
         .footer a:hover{text-decoration:underline}
+        .footer-links{display:flex;justify-content:center;gap:15px;margin-bottom:8px}
+        .footer-links a{color:#4a5a6a;text-decoration:none;font-size:0.8rem;transition:0.3s}
+        .footer-links a:hover{color:#4a9eff}
     </style>
 </head>
 <body>
@@ -27,12 +31,16 @@
         <div class="logo">AURELIXA</div>
         <div class="sub">Grabber as a <span>Service</span></div>
 
-        <div class="btn-group" id="btnGroup">
+        <div class="btn-group">
             <a href="login.html" class="btn btn-primary">🔓 Login</a>
             <a href="register.html" class="btn btn-outline">🚀 Create Account</a>
         </div>
 
         <div class="footer">
+            <div class="footer-links">
+                <a href="features.html">⚡ Features</a>
+                <a href="pricing.html">💰 Pricing</a>
+            </div>
             💬 Contact <a href="https://discord.com/users/briefjes">@briefjes</a> on Discord
         </div>
     </div>
@@ -41,7 +49,6 @@
         // Check if user is already logged in
         const token = localStorage.getItem('token');
         if (token) {
-            // Redirect to dashboard
             window.location.href = 'dashboard.html';
         }
     </script>
