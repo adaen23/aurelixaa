@@ -27,7 +27,7 @@
         <div class="logo">AURELIXA</div>
         <div class="sub">Grabber as a <span>Service</span></div>
 
-        <div class="btn-group">
+        <div class="btn-group" id="btnGroup">
             <a href="login.html" class="btn btn-primary">🔓 Login</a>
             <a href="register.html" class="btn btn-outline">🚀 Create Account</a>
         </div>
@@ -36,5 +36,14 @@
             💬 Contact <a href="https://discord.com/users/briefjes">@briefjes</a> on Discord
         </div>
     </div>
+
+    <script>
+        // Check if user is already logged in
+        const token = localStorage.getItem('token');
+        if (token) {
+            // Redirect to dashboard
+            window.location.href = 'dashboard.html';
+        }
+    </script>
 </body>
 </html>
