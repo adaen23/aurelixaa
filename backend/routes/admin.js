@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Deployment = require('../models/Deployment');
 const router = express.Router();
 
+// ===== ADMIN LOGIN =====
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -13,18 +14,26 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign({ admin: true }, process.env.JWT_SECRET, { expiresIn: '24h' });
     res.json({ token });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Admin login error:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
 
+// ===== GET ALL USERS =====
 router.get('/users', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized - No token' });
+    }
+    
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
+    if (!decoded.admin) {
+      return res.status(403).json({ error: 'Admin only' });
+    }
     
     const users = await User.find({}).select('-password');
+    
     const usersWithStats = await Promise.all(users.map(async (user) => {
       const deployments = await Deployment.find({ userId: user._id });
       let totalVisits = 0;
@@ -34,16 +43,23 @@ router.get('/users', async (req, res) => {
     
     res.json({ users: usersWithStats });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
 
+// ===== UPDATE USER PLAN =====
 router.put('/user/:userId/plan', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
+    if (!decoded.admin) {
+      return res.status(403).json({ error: 'Admin only' });
+    }
     
     const { userId } = req.params;
     const { plan } = req.body;
@@ -53,23 +69,35 @@ router.put('/user/:userId/plan', async (req, res) => {
     }
     
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
     
     user.plan = plan;
     await user.save();
     
-    res.json({ success: true });
+    res.json({ 
+      success: true, 
+      message: 'Plan updated successfully'
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Error updating plan:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
 
+// ===== UPDATE USER ROLE =====
 router.put('/user/:userId/role', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
+    if (!decoded.admin) {
+      return res.status(403).json({ error: 'Admin only' });
+    }
     
     const { userId } = req.params;
     const { role } = req.body;
@@ -79,83 +107,129 @@ router.put('/user/:userId/role', async (req, res) => {
     }
     
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
     
     user.role = role;
     await user.save();
     
-    res.json({ success: true });
+    res.json({ 
+      success: true, 
+      message: 'Role updated successfully'
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Error updating role:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
 
+// ===== DELETE USER =====
 router.delete('/user/:userId', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
+    if (!decoded.admin) {
+      return res.status(403).json({ error: 'Admin only' });
+    }
     
     const { userId } = req.params;
     const user = await User.findByIdAndDelete(userId);
-    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
     
     await Deployment.deleteMany({ userId });
-    res.json({ success: true });
+    res.json({ success: true, message: 'User deleted' });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Error deleting user:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
 
+// ===== BLACKLIST USER BY IP =====
 router.post('/blacklist', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
+    if (!decoded.admin) {
+      return res.status(403).json({ error: 'Admin only' });
+    }
     
     const { ip } = req.body;
-    if (!ip) return res.status(400).json({ error: 'IP is required' });
+    if (!ip || ip === 'unknown' || ip === '-') {
+      return res.status(400).json({ error: 'Invalid IP address' });
+    }
     
     const users = await User.find({ lastIp: ip });
+    if (users.length === 0) {
+      return res.status(404).json({ error: 'No users found with this IP' });
+    }
+    
     for (const user of users) {
       user.blacklisted = true;
       await user.save();
     }
     
-    res.json({ success: true, message: `Blacklisted ${users.length} users with IP ${ip}` });
+    res.json({ 
+      success: true, 
+      message: `Blacklisted ${users.length} users with IP ${ip}` 
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Error blacklisting:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
 
+// ===== UNBLACKLIST USER =====
 router.delete('/blacklist/:userId', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
+    if (!decoded.admin) {
+      return res.status(403).json({ error: 'Admin only' });
+    }
     
     const { userId } = req.params;
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
     
     user.blacklisted = false;
     await user.save();
     
-    res.json({ success: true });
+    res.json({ success: true, message: 'User unblacklisted' });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Error unblacklisting:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
 
+// ===== GET STATS =====
 router.get('/stats', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
+    if (!decoded.admin) {
+      return res.status(403).json({ error: 'Admin only' });
+    }
     
     const totalUsers = await User.countDocuments();
     const totalDeployments = await Deployment.countDocuments();
@@ -169,7 +243,8 @@ router.get('/stats', async (req, res) => {
       totalVisits: totalVisits[0]?.total || 0
     });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Error fetching stats:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
 
