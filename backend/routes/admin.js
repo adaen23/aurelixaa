@@ -3,6 +3,8 @@ const User = require('../models/User');
 const Deployment = require('../models/Deployment');
 const router = express.Router();
 
+console.log('✅ Admin routes loaded!');
+
 // ===== ADMIN LOGIN =====
 router.post('/login', (req, res) => {
   const { username, password } = req.body;
