@@ -15,7 +15,7 @@ router.post('/login', async (req, res) => {
     res.json({ token });
   } catch (error) {
     console.error('Admin login error:', error);
-    res.status(500).json({ error: 'Server error: ' + error.message });
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
@@ -23,14 +23,10 @@ router.post('/login', async (req, res) => {
 router.get('/users', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized - No token' });
-    }
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
     
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.admin) {
-      return res.status(403).json({ error: 'Admin only' });
-    }
+    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
     
     const users = await User.find({}).select('-password');
     
@@ -44,44 +40,42 @@ router.get('/users', async (req, res) => {
     res.json({ users: usersWithStats });
   } catch (error) {
     console.error('Error fetching users:', error);
-    res.status(500).json({ error: 'Server error: ' + error.message });
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
-// ===== UPDATE USER PLAN =====
+// ===== UPDATE USER PLAN (SIMPLE FIX) =====
 router.put('/user/:userId/plan', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
     
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.admin) {
-      return res.status(403).json({ error: 'Admin only' });
-    }
+    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
     
     const { userId } = req.params;
     const { plan } = req.body;
     
-    if (!['free', 'pro', 'elite', 'lifetime'].includes(plan)) {
-      return res.status(400).json({ error: 'Invalid plan' });
-    }
+    console.log('📝 Update plan - User:', userId, 'Plan:', plan);
     
+    // Check if user exists
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
     
+    // Update plan
     user.plan = plan;
     await user.save();
     
+    console.log('✅ Plan updated for:', user.email);
     res.json({ 
       success: true, 
-      message: 'Plan updated successfully'
+      message: 'Plan updated successfully',
+      user: { id: user._id, email: user.email, plan: user.plan }
     });
   } catch (error) {
-    console.error('Error updating plan:', error);
+    console.error('❌ Update plan error:', error);
     res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
@@ -90,21 +84,15 @@ router.put('/user/:userId/plan', async (req, res) => {
 router.put('/user/:userId/role', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
     
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.admin) {
-      return res.status(403).json({ error: 'Admin only' });
-    }
+    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
     
     const { userId } = req.params;
     const { role } = req.body;
     
-    if (!['user', 'mod', 'admin'].includes(role)) {
-      return res.status(400).json({ error: 'Invalid role' });
-    }
+    console.log('📝 Update role - User:', userId, 'Role:', role);
     
     const user = await User.findById(userId);
     if (!user) {
@@ -114,12 +102,14 @@ router.put('/user/:userId/role', async (req, res) => {
     user.role = role;
     await user.save();
     
+    console.log('✅ Role updated for:', user.email);
     res.json({ 
       success: true, 
-      message: 'Role updated successfully'
+      message: 'Role updated successfully',
+      user: { id: user._id, email: user.email, role: user.role }
     });
   } catch (error) {
-    console.error('Error updating role:', error);
+    console.error('❌ Update role error:', error);
     res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
@@ -128,25 +118,24 @@ router.put('/user/:userId/role', async (req, res) => {
 router.delete('/user/:userId', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
     
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.admin) {
-      return res.status(403).json({ error: 'Admin only' });
-    }
+    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
     
     const { userId } = req.params;
+    console.log('🗑️ Deleting user:', userId);
+    
     const user = await User.findByIdAndDelete(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
     
     await Deployment.deleteMany({ userId });
+    console.log('✅ User deleted:', user.email);
     res.json({ success: true, message: 'User deleted' });
   } catch (error) {
-    console.error('Error deleting user:', error);
+    console.error('❌ Delete user error:', error);
     res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
@@ -155,16 +144,14 @@ router.delete('/user/:userId', async (req, res) => {
 router.post('/blacklist', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
     
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.admin) {
-      return res.status(403).json({ error: 'Admin only' });
-    }
+    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
     
     const { ip } = req.body;
+    console.log('🚫 Blacklisting IP:', ip);
+    
     if (!ip || ip === 'unknown' || ip === '-' || ip === '') {
       return res.status(400).json({ error: 'Invalid IP address' });
     }
@@ -181,12 +168,10 @@ router.post('/blacklist', async (req, res) => {
       count++;
     }
     
-    res.json({ 
-      success: true, 
-      message: `Blacklisted ${count} users with IP ${ip}` 
-    });
+    console.log(`✅ Blacklisted ${count} users`);
+    res.json({ success: true, message: `Blacklisted ${count} users with IP ${ip}` });
   } catch (error) {
-    console.error('Error blacklisting:', error);
+    console.error('❌ Blacklist error:', error);
     res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
@@ -195,16 +180,14 @@ router.post('/blacklist', async (req, res) => {
 router.delete('/blacklist/:userId', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
     
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.admin) {
-      return res.status(403).json({ error: 'Admin only' });
-    }
+    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
     
     const { userId } = req.params;
+    console.log('✅ Unblacklisting user:', userId);
+    
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -213,9 +196,10 @@ router.delete('/blacklist/:userId', async (req, res) => {
     user.blacklisted = false;
     await user.save();
     
+    console.log('✅ User unblacklisted:', user.email);
     res.json({ success: true, message: 'User unblacklisted' });
   } catch (error) {
-    console.error('Error unblacklisting:', error);
+    console.error('❌ Unblacklist error:', error);
     res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
@@ -224,14 +208,10 @@ router.delete('/blacklist/:userId', async (req, res) => {
 router.get('/stats', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
     
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.admin) {
-      return res.status(403).json({ error: 'Admin only' });
-    }
+    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
     
     const totalUsers = await User.countDocuments();
     const totalDeployments = await Deployment.countDocuments();
@@ -245,7 +225,7 @@ router.get('/stats', async (req, res) => {
       totalVisits: totalVisits[0]?.total || 0
     });
   } catch (error) {
-    console.error('Error fetching stats:', error);
+    console.error('❌ Stats error:', error);
     res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
