@@ -3,168 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plans - AURELIXA</title>
+    <title>Pricing - AURELIXA</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{background:#0a0e1a;color:#c8d6e5;font-family:'Segoe UI',sans-serif;padding:20px;min-height:100vh}
-        .container{max-width:900px;margin:0 auto}
-        .header{display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:2px solid #1a2a4a;margin-bottom:30px}
-        .header h1{font-size:2rem;color:#4a9eff;text-shadow:0 0 20px rgba(74,158,255,0.2)}
-        .back-link{color:#4a9eff;text-decoration:none;font-size:0.9rem}
-        .back-link:hover{text-decoration:underline}
-        .current-plan{background:#111b2e;border:1px solid #1a2a4a;border-radius:12px;padding:20px;text-align:center;margin-bottom:30px}
-        .current-plan .label{color:#6a8aaa;font-size:0.9rem}
-        .current-plan .plan-name{font-size:2rem;font-weight:800;color:#4a9eff;text-transform:uppercase;margin:5px 0}
-        .current-plan .details{color:#6a8aaa;font-size:0.9rem}
-        .plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
-        .plan-card{background:#111b2e;border:2px solid #1a2a4a;border-radius:16px;padding:30px;text-align:center;transition:0.3s}
-        .plan-card:hover{transform:translateY(-5px);box-shadow:0 20px 40px rgba(0,0,0,0.3)}
-        .plan-card.popular{border-color:#4a9eff;box-shadow:0 0 30px rgba(74,158,255,0.1)}
-        .plan-card .popular-badge{background:#4a9eff;color:#0a0e1a;padding:2px 15px;border-radius:20px;font-size:0.7rem;font-weight:700;text-transform:uppercase;display:inline-block;margin-bottom:10px}
-        .plan-card .name{font-size:1.5rem;font-weight:700;color:#c8d6e5}
-        .plan-card .price{font-size:2.5rem;font-weight:800;color:#4a9eff;margin:15px 0}
-        .plan-card .price span{font-size:1rem;color:#6a8aaa;font-weight:400}
-        .plan-card .features{list-style:none;padding:0;margin:15px 0}
-        .plan-card .features li{color:#8a9aaa;padding:6px 0;border-bottom:1px solid #0d1a2a;font-size:0.9rem}
-        .plan-card .features li:last-child{border-bottom:none}
-        .plan-card .features li .check{color:#4eff6a;margin-right:8px}
-        .plan-card .features li .cross{color:#ff4757;margin-right:8px}
-        .btn-plan{width:100%;padding:12px;background:#4a9eff;color:#0a0e1a;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;transition:0.3s;margin-top:15px}
-        .btn-plan:hover{background:#6ab0ff;transform:scale(1.02)}
-        .btn-plan.current{background:#1a2a4a;color:#6a8aaa;cursor:not-allowed}
-        .btn-plan.disabled{background:#1a1a2a;color:#4a5a6a;cursor:not-allowed}
-        .contact-section{background:#111b2e;border:1px solid #1a2a4a;border-radius:12px;padding:25px;text-align:center;margin-top:30px}
-        .contact-section p{color:#6a8aaa;margin-bottom:10px}
-        .contact-section .highlight{color:#4a9eff;font-weight:600}
+        .container{max-width:600px;width:100%;margin:0 auto;background:#111b2e;border:1px solid #1a2a4a;border-radius:24px;padding:40px;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+        .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:10px}
+        .header h1{font-size:2rem;color:#4a9eff}
+        .header a{color:#4a5a6a;text-decoration:none;font-size:0.9rem}
+        .header a:hover{color:#4a9eff}
+        .pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+        .plan{background:#0a0e1a;border:1px solid #1a2a4a;border-radius:14px;padding:20px 15px;text-align:center;transition:0.3s}
+        .plan:hover{border-color:#4a9eff;transform:translateY(-4px)}
+        .plan.popular{border-color:#4a9eff;background:#0d1a2a}
+        .plan .badge{display:inline-block;background:#4a9eff;color:#0a0e1a;padding:1px 12px;border-radius:20px;font-size:0.55rem;font-weight:700;text-transform:uppercase;margin-bottom:6px}
+        .plan .name{color:#c8d6e5;font-weight:700;font-size:1.1rem}
+        .plan .price{color:#4a9eff;font-weight:900;font-size:1.8rem}
+        .plan .price span{color:#6a8aaa;font-size:0.7rem;font-weight:400}
+        .plan .features{color:#4a5a6a;font-size:0.75rem;margin:10px 0;line-height:1.8}
+        .plan .btn{background:#4a9eff;color:#0a0e1a;border:none;padding:8px 16px;border-radius:8px;font-size:0.8rem;font-weight:700;cursor:pointer;transition:0.3s;width:100%}
+        .plan .btn:hover{background:#6ab0ff}
+        .plan .btn.outline{background:transparent;border:1px solid #4a9eff;color:#4a9eff}
+        .plan .btn.outline:hover{background:#1a2a4a}
+        .footer{color:#4a5a6a;text-align:center;font-size:0.8rem;margin-top:25px;padding-top:15px;border-top:1px solid #0d1a2a}
+        .footer a{color:#4a9eff;text-decoration:none}
+        @media(max-width:500px){.pricing-grid{grid-template-columns:1fr}}
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📦 Plans</h1>
-            <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+            <h1>💰 Pricing</h1>
+            <a href="index.html">← Back to Home</a>
         </div>
 
-        <div class="current-plan" id="currentPlan">
-            <div class="label">Your Current Plan</div>
-            <div class="plan-name" id="userPlanName">FREE</div>
-            <div class="details" id="userPlanDetails">2 deploys per day • 1 hour expiry</div>
-        </div>
-
-        <div class="plans">
-            <div class="plan-card">
+        <div class="pricing-grid">
+            <div class="plan">
                 <div class="name">Free</div>
-                <div class="price">$0 <span>/ forever</span></div>
-                <ul class="features">
-                    <li><span class="check">✅</span> 2 deploys/day</li>
-                    <li><span class="check">✅</span> 1 hour active</li>
-                    <li><span class="check">✅</span> Basic stats</li>
-                    <li><span class="cross">❌</span> VPN detection</li>
-                    <li><span class="cross">❌</span> Full logs</li>
-                </ul>
-                <button class="btn-plan current" id="btnFree">Current Plan</button>
+                <div class="price">$0 <span>/forever</span></div>
+                <div class="features">
+                    ⚡ 2 deploys/day<br>
+                    ⏰ 1 hour expiry<br>
+                    📊 Basic stats
+                </div>
+                <button class="btn outline" onclick="window.location.href='register.html'">Get Started</button>
             </div>
 
-            <div class="plan-card popular">
-                <div class="popular-badge">🔥 POPULAR</div>
+            <div class="plan popular">
+                <div class="badge">🔥 POPULAR</div>
                 <div class="name">Pro</div>
-                <div class="price">$9.99 <span>/ month</span></div>
-                <ul class="features">
-                    <li><span class="check">✅</span> 10 deploys/day</li>
-                    <li><span class="check">✅</span> 24 hours active</li>
-                    <li><span class="check">✅</span> Full stats & logs</li>
-                    <li><span class="check">✅</span> VPN detection</li>
-                    <li><span class="cross">❌</span> Custom branding</li>
-                </ul>
-                <button class="btn-plan" id="btnPro">Upgrade to Pro</button>
+                <div class="price">$9.99 <span>/month</span></div>
+                <div class="features">
+                    ⚡ 10 deploys/day<br>
+                    ⏰ 24 hour expiry<br>
+                    🛡️ VPN Detection<br>
+                    📊 Full logs
+                </div>
+                <button class="btn" onclick="alert('💳 Contact @briefjes on Discord to upgrade')">Upgrade</button>
             </div>
 
-            <div class="plan-card">
+            <div class="plan">
                 <div class="name">Elite</div>
-                <div class="price">$15 <span>/ month</span></div>
-                <ul class="features">
-                    <li><span class="check">✅</span> 50 deploys/day</li>
-                    <li><span class="check">✅</span> 48 hours active</li>
-                    <li><span class="check">✅</span> Full stats & logs</li>
-                    <li><span class="check">✅</span> VPN detection</li>
-                    <li><span class="check">✅</span> Custom branding</li>
-                </ul>
-                <button class="btn-plan" id="btnElite">Upgrade to Elite</button>
+                <div class="price">$15 <span>/month</span></div>
+                <div class="features">
+                    ⚡ 50 deploys/day<br>
+                    ⏰ 48 hour expiry<br>
+                    🛡️ VPN Detection<br>
+                    🎨 Custom branding
+                </div>
+                <button class="btn outline" onclick="alert('💳 Contact @briefjes on Discord to upgrade')">Upgrade</button>
             </div>
 
-            <div class="plan-card">
+            <div class="plan">
                 <div class="name">Lifetime</div>
-                <div class="price">$25 <span>/ one-time</span></div>
-                <ul class="features">
-                    <li><span class="check">✅</span> Unlimited deploys</li>
-                    <li><span class="check">✅</span> Forever active</li>
-                    <li><span class="check">✅</span> Full stats & logs</li>
-                    <li><span class="check">✅</span> VPN detection</li>
-                    <li><span class="check">✅</span> Custom branding</li>
-                    <li><span class="check">✅</span> Priority support</li>
-                </ul>
-                <button class="btn-plan" id="btnLifetime">Get Lifetime</button>
+                <div class="price">$25 <span>/one-time</span></div>
+                <div class="features">
+                    ⚡ Unlimited deploys<br>
+                    ⏰ Forever active<br>
+                    🛡️ All features<br>
+                    👑 Priority support
+                </div>
+                <button class="btn outline" onclick="alert('💳 Contact @briefjes on Discord to upgrade')">Get</button>
             </div>
         </div>
 
-        <div class="contact-section">
-            <p>💳 To upgrade, contact <span class="highlight">@briefjes</span> on Discord with your email and desired plan.</p>
-            <p style="font-size:0.8rem;color:#4a5a6a;">Payment via crypto or PayPal accepted</p>
+        <div class="footer">
+            💬 Contact <a href="https://discord.com/users/briefjes">@briefjes</a> on Discord for upgrades
         </div>
     </div>
-    <script>
-        const API_URL = 'https://api.aurelixa.online';
-        const token = localStorage.getItem('token');
-        if (!token) window.location.href = 'login.html';
-
-        let currentPlan = 'free';
-
-        async function loadUser() {
-            try {
-                const res = await fetch(API_URL + '/api/auth/me', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                const data = await res.json();
-                currentPlan = data.user.plan || 'free';
-                document.getElementById('userPlanName').textContent = currentPlan.toUpperCase();
-                
-                const details = {
-                    free: '2 deploys/day • 1 hour expiry',
-                    pro: '10 deploys/day • 24 hours expiry',
-                    elite: '50 deploys/day • 48 hours expiry',
-                    lifetime: 'Unlimited deploys • Forever'
-                };
-                document.getElementById('userPlanDetails').textContent = details[currentPlan] || details.free;
-
-                // Disable buttons based on current plan
-                const btns = {
-                    free: document.getElementById('btnFree'),
-                    pro: document.getElementById('btnPro'),
-                    elite: document.getElementById('btnElite'),
-                    lifetime: document.getElementById('btnLifetime')
-                };
-                Object.keys(btns).forEach(key => {
-                    if (key === currentPlan) {
-                        btns[key].className = 'btn-plan current';
-                        btns[key].textContent = 'Current Plan';
-                    } else {
-                        btns[key].className = 'btn-plan';
-                        btns[key].textContent = key === 'free' ? 'Downgrade' : 'Upgrade to ' + key.charAt(0).toUpperCase() + key.slice(1);
-                    }
-                });
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        // All upgrade buttons redirect to contact @briefjes
-        document.querySelectorAll('.btn-plan:not(.current)').forEach(btn => {
-            btn.addEventListener('click', () => {
-                alert('💳 Contact @briefjes on Discord to upgrade your plan!\n\nInclude your email: ' + (localStorage.getItem('userEmail') || 'your email'));
-            });
-        });
-
-        loadUser();
-    </script>
 </body>
 </html>
