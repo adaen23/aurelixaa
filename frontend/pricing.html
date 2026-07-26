@@ -33,4 +33,20 @@
         .plan .btn.outline:hover{background:rgba(124,58,237,0.04);border-color:rgba(124,58,237,0.3)}
         .footer{color:#444466;text-align:center;font-size:0.75rem;margin-top:28px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.03)}
         .footer a{color:#a78bfa;text-decoration:none}
-        .footer a:hover{
+        .footer a:hover{color:#c4b5fd}
+        @media(max-width:500px){.pricing-grid{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header"><h1>💰 Pricing</h1><a href="index.html">← Back</a></div>
+        <div class="pricing-grid">
+            <div class="plan"><div class="name">Free</div><div class="price">$0 <span>/forever</span></div><div class="features">⚡ 2 deploys/day<br>⏰ 1 hour expiry<br>📊 Basic stats</div><button class="btn outline" onclick="window.location.href='register.html'">Get Started</button></div>
+            <div class="plan popular"><div class="badge">🔥 Popular</div><div class="name">Pro</div><div class="price">$9.99 <span>/month</span></div><div class="features">⚡ 10 deploys/day<br>⏰ 24 hour expiry<br>🛡️ VPN Detection<br>📊 Full logs</div><button class="btn" onclick="alert('💳 Contact @briefjes on Discord to upgrade')">Upgrade</button></div>
+            <div class="plan"><div class="name">Elite</div><div class="price">$15 <span>/month</span></div><div class="features">⚡ 50 deploys/day<br>⏰ 48 hour expiry<br>🛡️ VPN Detection<br>🎨 Custom branding</div><button class="btn outline" onclick="alert('💳 Contact @briefjes on Discord to upgrade')">Upgrade</button></div>
+            <div class="plan"><div class="name">Lifetime</div><div class="price">$25 <span>/one-time</span></div><div class="features">⚡ Unlimited deploys<br>⏰ Forever active<br>🛡️ All features<br>👑 Priority support</div><button class="btn outline" onclick="alert('💳 Contact @briefjes on Discord to upgrade')">Get</button></div>
+        </div>
+        <div class="footer">💬 Contact <a href="https://discord.com/users/briefjes">@briefjes</a> on Discord</div>
+    </div>
+</body>
+</html>
