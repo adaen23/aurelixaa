@@ -3,17 +3,34 @@ const User = require('../models/User');
 const Deployment = require('../models/Deployment');
 const router = express.Router();
 
+// Admin token (wordt gebruikt voor authenticatie)
+const ADMIN_TOKEN = 'admin-token-123';
+
 // ===== ADMIN LOGIN =====
 router.post('/login', (req, res) => {
   const { username, password } = req.body;
-  if (username === 'admin' && password === 'aurelixa_admin_2024') {
-    return res.json({ token: 'admin-token-123' });
+  // Gebruik .env variabelen!
+  if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
+    return res.json({ token: ADMIN_TOKEN });
   }
   res.status(401).json({ error: 'Invalid credentials' });
 });
 
-// ===== GET ALL USERS (GEEN TOKEN NODIG) =====
-router.get('/users', async (req, res) => {
+// ===== MIDDLEWARE: Check admin token =====
+function checkAdminToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized: No token provided' });
+  }
+  const token = authHeader.split(' ')[1];
+  if (token !== ADMIN_TOKEN) {
+    return res.status(403).json({ error: 'Forbidden: Invalid token' });
+  }
+  next();
+}
+
+// ===== GET ALL USERS =====
+router.get('/users', checkAdminToken, async (req, res) => {
   try {
     const users = await User.find({}).select('-password');
     res.json({ users });
@@ -22,8 +39,8 @@ router.get('/users', async (req, res) => {
   }
 });
 
-// ===== UPDATE PLAN (GEEN TOKEN NODIG) =====
-router.put('/user/:userId/plan', async (req, res) => {
+// ===== UPDATE PLAN =====
+router.put('/user/:userId/plan', checkAdminToken, async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
     if (!user) return res.status(404).json({ error: 'User not found' });
@@ -35,8 +52,8 @@ router.put('/user/:userId/plan', async (req, res) => {
   }
 });
 
-// ===== UPDATE ROLE (GEEN TOKEN NODIG) =====
-router.put('/user/:userId/role', async (req, res) => {
+// ===== UPDATE ROLE =====
+router.put('/user/:userId/role', checkAdminToken, async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
     if (!user) return res.status(404).json({ error: 'User not found' });
@@ -48,8 +65,8 @@ router.put('/user/:userId/role', async (req, res) => {
   }
 });
 
-// ===== DELETE USER (GEEN TOKEN NODIG) =====
-router.delete('/user/:userId', async (req, res) => {
+// ===== DELETE USER =====
+router.delete('/user/:userId', checkAdminToken, async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.userId);
     if (!user) return res.status(404).json({ error: 'User not found' });
@@ -60,8 +77,8 @@ router.delete('/user/:userId', async (req, res) => {
   }
 });
 
-// ===== BLACKLIST (GEEN TOKEN NODIG) =====
-router.post('/blacklist', async (req, res) => {
+// ===== BLACKLIST =====
+router.post('/blacklist', checkAdminToken, async (req, res) => {
   try {
     const { ip } = req.body;
     if (!ip || ip === 'unknown' || ip === '-') {
@@ -78,8 +95,8 @@ router.post('/blacklist', async (req, res) => {
   }
 });
 
-// ===== UNBLACKLIST (GEEN TOKEN NODIG) =====
-router.delete('/blacklist/:userId', async (req, res) => {
+// ===== UNBLACKLIST =====
+router.delete('/blacklist/:userId', checkAdminToken, async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
     if (!user) return res.status(404).json({ error: 'User not found' });
@@ -91,8 +108,8 @@ router.delete('/blacklist/:userId', async (req, res) => {
   }
 });
 
-// ===== STATS (GEEN TOKEN NODIG) =====
-router.get('/stats', async (req, res) => {
+// ===== STATS =====
+router.get('/stats', checkAdminToken, async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
     const totalDeployments = await Deployment.countDocuments();
