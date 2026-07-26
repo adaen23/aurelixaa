@@ -176,6 +176,7 @@
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 const d = await r.json();
+                console.log('Users from API:', d);
                 allUsers = d.users || [];
                 renderUsers(allUsers);
                 loadStats();
@@ -238,11 +239,13 @@
             renderUsers(f);
         }
 
+        // ===== UPDATE USER (PLAN + ROLE) =====
         window.updateUser = async (userId) => {
             const plan = document.getElementById('plan-' + userId).value;
             const role = document.getElementById('role-' + userId).value;
             
             try {
+                // Update plan
                 let res = await fetch(API_URL + '/api/admin/user/' + userId + '/plan', {
                     method: 'PUT',
                     headers: { 
@@ -258,6 +261,7 @@
                     return; 
                 }
                 
+                // Update role
                 res = await fetch(API_URL + '/api/admin/user/' + userId + '/role', {
                     method: 'PUT',
                     headers: { 
@@ -280,6 +284,7 @@
             }
         };
 
+        // ===== DELETE USER =====
         window.confirmDelete = (userId) => {
             showModal('🗑️', 'Delete User?', 'This will permanently delete the user and all their data.', 'Delete', 'danger', () => deleteUser(userId));
         };
@@ -303,6 +308,7 @@
             }
         }
 
+        // ===== BLACKLIST =====
         window.confirmBlacklist = (userId) => {
             showModal('🚫', 'Blacklist User?', 'This user will NOT be able to login or register.', 'Blacklist', 'danger', () => blacklistUser(userId));
         };
@@ -310,8 +316,13 @@
         async function blacklistUser(userId) {
             try {
                 const u = allUsers.find(x => x._id === userId);
-                if (!u || !u.lastIp || u.lastIp === '-' || u.lastIp === 'unknown') {
-                    showToast('❌ No valid IP address found for this user', 'error');
+                if (!u) {
+                    showToast('❌ User not found', 'error');
+                    return;
+                }
+                
+                if (!u.lastIp || u.lastIp === '-' || u.lastIp === 'unknown' || u.lastIp === '') {
+                    showToast('❌ This user has no IP address stored. They need to login first.', 'error');
                     return;
                 }
                 
@@ -325,7 +336,8 @@
                 });
                 
                 if (res.ok) { 
-                    showToast('✅ User blacklisted successfully!', 'success'); 
+                    const data = await res.json();
+                    showToast('✅ ' + data.message, 'success'); 
                     loadUsers(); 
                 } else { 
                     const d = await res.text(); 
@@ -336,6 +348,7 @@
             }
         }
 
+        // ===== UNBLACKLIST =====
         window.confirmUnblacklist = (userId) => {
             showModal('✅', 'Unblacklist User?', 'This user will be able to login again.', 'Unblacklist', 'success', () => unblacklistUser(userId));
         };
