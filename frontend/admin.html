@@ -4,52 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - AURELIXA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#0a0e1a;color:#c8d6e5;font-family:'Segoe UI',sans-serif;padding:20px;min-height:100vh}
-        .container{max-width:1200px;margin:0 auto}
-        .header{display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:2px solid #1a2a4a;margin-bottom:30px;flex-wrap:wrap;gap:15px}
-        .header h1{font-size:2rem;color:#4a9eff;text-shadow:0 0 20px rgba(74,158,255,0.2)}
-        .header .badge{background:#1a2a4a;color:#4a9eff;padding:4px 15px;border-radius:20px;font-size:0.8rem}
-        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;margin-bottom:30px}
-        .stat-card{background:#111b2e;border:1px solid #1a2a4a;border-radius:12px;padding:20px;text-align:center;transition:0.3s}
-        .stat-card:hover{box-shadow:0 0 30px rgba(74,158,255,0.1)}
-        .stat-card .number{font-size:2.5rem;font-weight:800;color:#4a9eff}
-        .stat-card .label{color:#6a8aaa;font-size:0.8rem;margin-top:5px}
-        .users-table{background:#111b2e;border-radius:12px;padding:20px;border:1px solid #1a2a4a;overflow-x:auto}
-        table{width:100%;border-collapse:collapse}
-        th{text-align:left;padding:12px;color:#4a9eff;border-bottom:2px solid #1a2a4a;font-weight:600}
-        td{padding:12px;border-bottom:1px solid #0d1a2a;color:#8a9aaa}
-        .plan-select{padding:6px 12px;border-radius:6px;border:1px solid #1a2a4a;background:#0a0e1a;color:#c8d6e5;font-size:0.9rem}
-        .plan-select:focus{outline:none;border-color:#4a9eff}
-        .btn-save{background:#4a9eff;color:#0a0e1a;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:0.8rem;font-weight:600;transition:0.3s}
-        .btn-save:hover{background:#6ab0ff}
-        .btn-danger{background:#ff4757;color:white;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:0.8rem;transition:0.3s}
-        .btn-danger:hover{background:#ff6b7a}
-        .btn-logout{background:transparent;color:#6a8aaa;border:1px solid #1a2a4a;padding:8px 20px;border-radius:8px;cursor:pointer;transition:0.3s}
-        .btn-logout:hover{background:#1a2a4a;color:#c8d6e5}
-        .back-link{display:inline-block;color:#4a9eff;text-decoration:none;margin-right:15px}
-        .back-link:hover{text-decoration:underline}
-        .ip-badge{background:#0a1a2a;color:#4a9eff;padding:2px 10px;border-radius:12px;font-size:0.7rem;font-family:monospace}
-        .status-badge{padding:2px 10px;border-radius:12px;font-size:0.7rem}
-        .status-badge.active{background:#1a3a1a;color:#4eff6a}
-        .status-badge.free{background:#1a1a2a;color:#6a8aaa}
-        .status-badge.pro{background:#1a2a4a;color:#4a9eff}
-        .status-badge.elite{background:#2a1a4a;color:#9b59b6}
-        .status-badge.lifetime{background:#2a2a1a;color:#f1c40f}
-        .empty{color:#4a5a6a;text-align:center;padding:40px}
-        .search-box{width:100%;padding:10px 15px;background:#0a0e1a;border:1px solid #1a2a4a;border-radius:8px;color:#c8d6e5;margin-bottom:15px;font-size:1rem}
-        .search-box:focus{outline:none;border-color:#4a9eff}
+        body{background:#0a0a0f;color:#e8e8e8;font-family:'Inter',sans-serif;padding:24px;min-height:100vh;position:relative}
+        body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(124,58,237,0.04) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(124,58,237,0.03) 0%,transparent 60%);pointer-events:none;z-index:0}
+        .container{max-width:1000px;margin:0 auto;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:24px;padding:32px 36px;backdrop-filter:blur(10px);position:relative;z-index:1;transition:all 0.4s ease}
+        .container:hover{border-color:rgba(124,58,237,0.08)}
+        .header{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.04);margin-bottom:28px;flex-wrap:wrap;gap:12px}
+        .header h1{font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,#7c3aed 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .header a{color:#444466;text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.3s}
+        .header a:hover{color:#a78bfa}
+        .header .btn-logout{background:transparent;color:#444466;border:1px solid rgba(255,255,255,0.06);padding:6px 18px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.8rem;font-weight:600;transition:all 0.3s ease}
+        .header .btn-logout:hover{background:rgba(255,255,255,0.03);color:#a78bfa}
+        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:28px}
+        .stat-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:12px;padding:18px 16px;text-align:center;transition:all 0.3s ease}
+        .stat-card:hover{border-color:rgba(124,58,237,0.1);transform:translateY(-2px)}
+        .stat-card .number{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#7c3aed 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .stat-card .label{color:#666688;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px}
+        .users-table{overflow-x:auto}
+        table{width:100%;border-collapse:collapse;font-size:0.85rem}
+        th{text-align:left;padding:12px 10px;color:#a78bfa;border-bottom:1px solid rgba(255,255,255,0.06);font-weight:600}
+        td{padding:12px 10px;border-bottom:1px solid rgba(255,255,255,0.03);color:#c8c8e8}
+        .ip-badge{background:rgba(255,255,255,0.04);padding:2px 12px;border-radius:20px;font-size:0.7rem;font-weight:500;font-family:monospace;color:#8888aa;border:1px solid rgba(255,255,255,0.04)}
+        .plan-select{padding:6px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;color:#e8e8e8;font-size:0.8rem;font-family:inherit;transition:all 0.3s ease}
+        .plan-select:focus{outline:none;border-color:rgba(124,58,237,0.3)}
+        .btn-save{background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);color:#fff;border:none;padding:5px 16px;border-radius:6px;cursor:pointer;font-size:0.75rem;font-weight:600;transition:all 0.3s ease;font-family:inherit}
+        .btn-save:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(124,58,237,0.2)}
+        .search-box{width:100%;padding:10px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;color:#e8e8e8;font-size:0.9rem;font-family:inherit;margin-bottom:16px;transition:all 0.3s ease}
+        .search-box:focus{outline:none;border-color:rgba(124,58,237,0.2)}
+        .search-box::placeholder{color:#333355}
+        .empty{color:#444466;text-align:center;padding:30px;font-size:0.9rem}
+        .status-badge{padding:2px 12px;border-radius:20px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:0.3px}
+        .status-badge.free{background:rgba(255,255,255,0.04);color:#666688;border:1px solid rgba(255,255,255,0.04)}
+        .status-badge.pro{background:rgba(124,58,237,0.15);color:#a78bfa;border:1px solid rgba(124,58,237,0.1)}
+        .status-badge.elite{background:rgba(124,58,237,0.15);color:#a78bfa;border:1px solid rgba(124,58,237,0.1)}
+        .status-badge.lifetime{background:rgba(241,196,15,0.1);color:#f1c40f;border:1px solid rgba(241,196,15,0.1)}
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>⚙️ Admin Panel</h1>
-            <div>
-                <a href="dashboard.html" class="back-link">← Dashboard</a>
-                <button class="btn-logout" onclick="logout()">Logout</button>
-            </div>
+            <div><a href="dashboard.html">← Dashboard</a><button class="btn-logout" onclick="logout()" style="margin-left:12px;">Logout</button></div>
         </div>
 
         <div class="stats">
@@ -57,144 +57,34 @@
             <div class="stat-card"><div class="number" id="totalDeployments">0</div><div class="label">Total Deployments</div></div>
             <div class="stat-card"><div class="number" id="activeDeployments">0</div><div class="label">Active Links</div></div>
             <div class="stat-card"><div class="number" id="totalVisits">0</div><div class="label">Total Visits</div></div>
-            <div class="stat-card"><div class="number" id="totalPro">0</div><div class="label">Pro Users</div></div>
-            <div class="stat-card"><div class="number" id="totalElite">0</div><div class="label">Elite Users</div></div>
         </div>
 
         <div class="users-table">
-            <h2 style="color:#4a9eff;margin-bottom:15px;font-size:1.2rem;">👥 Users</h2>
+            <h2 style="color:#a78bfa;font-size:1rem;font-weight:700;margin-bottom:12px;">👥 Users</h2>
             <input type="text" class="search-box" id="searchInput" placeholder="🔍 Search by email or Discord..." onkeyup="filterUsers()">
-            <div id="usersList">
-                <div class="empty">Loading users...</div>
-            </div>
+            <div id="usersList"><div class="empty">Loading users...</div></div>
         </div>
     </div>
 
     <script>
-        const API_URL = 'https://api.aurelixa.online';
-        const token = localStorage.getItem('adminToken');
-        if (!token) window.location.href = 'admin-login.html';
+        const API_URL='https://api.aurelixa.online';
+        const token=localStorage.getItem('adminToken');
+        if(!token)window.location.href='admin-login.html';
+        let allUsers=[];
 
-        let allUsers = [];
+        async function loadStats(){try{const r=await fetch(API_URL+'/api/admin/stats',{headers:{'Authorization':'Bearer '+token}}),d=await r.json();document.getElementById('totalUsers').textContent=d.totalUsers||0;document.getElementById('totalDeployments').textContent=d.totalDeployments||0;document.getElementById('activeDeployments').textContent=d.activeDeployments||0;document.getElementById('totalVisits').textContent=d.totalVisits||0}catch(e){}}
 
-        async function loadStats() {
-            try {
-                const res = await fetch(API_URL + '/api/admin/stats', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                const data = await res.json();
-                document.getElementById('totalUsers').textContent = data.totalUsers || 0;
-                document.getElementById('totalDeployments').textContent = data.totalDeployments || 0;
-                document.getElementById('activeDeployments').textContent = data.activeDeployments || 0;
-                document.getElementById('totalVisits').textContent = data.totalVisits || 0;
-                
-                // Count pro/elite users
-                let pro = 0, elite = 0;
-                if (allUsers.length) {
-                    allUsers.forEach(u => {
-                        if (u.plan === 'pro') pro++;
-                        if (u.plan === 'elite') elite++;
-                    });
-                }
-                document.getElementById('totalPro').textContent = pro;
-                document.getElementById('totalElite').textContent = elite;
-            } catch (e) { console.error(e); }
-        }
+        async function loadUsers(){try{const r=await fetch(API_URL+'/api/admin/users',{headers:{'Authorization':'Bearer '+token}}),d=await r.json();allUsers=d.users||[];renderUsers(allUsers);loadStats()}catch(e){}}
 
-        async function loadUsers() {
-            try {
-                const res = await fetch(API_URL + '/api/admin/users', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                const data = await res.json();
-                allUsers = data.users || [];
-                renderUsers(allUsers);
-                loadStats();
-            } catch (e) { console.error(e); }
-        }
+        function renderUsers(users){const list=document.getElementById('usersList');if(!users||users.length===0){list.innerHTML='<div class="empty">No users found</div>';return}
+        let html=`<table><tr><th>Email</th><th>Discord</th><th>IP</th><th>Plan</th><th>Deploys</th><th>Visits</th><th>Action</th></tr>`;
+        users.forEach(u=>{const ip=u.lastIp||'-';const visits=u.totalVisits||0;html+=`<tr><td>${u.email}</td><td><strong>${u.discord||'-'}</strong></td><td><span class="ip-badge">${ip}</span></td><td><span class="status-badge ${u.plan}">${u.plan.toUpperCase()}</span></td><td>${u.dailyDeploys||0}</td><td>${visits}</td><td><select class="plan-select" data-userid="${u.id}" id="plan-${u.id}"><option value="free" ${u.plan==='free'?'selected':''}>Free</option><option value="pro" ${u.plan==='pro'?'selected':''}>Pro</option><option value="elite" ${u.plan==='elite'?'selected':''}>Elite</option><option value="lifetime" ${u.plan==='lifetime'?'selected':''}>Lifetime</option></select><button class="btn-save" onclick="updatePlan('${u.id}')">Save</button></td></tr>`});html+='</table>';list.innerHTML=html}
 
-        function renderUsers(users) {
-            const list = document.getElementById('usersList');
-            if (!users || users.length === 0) {
-                list.innerHTML = '<div class="empty">No users found</div>';
-                return;
-            }
-            let html = `
-                <table>
-                    <tr>
-                        <th>Email</th>
-                        <th>Discord</th>
-                        <th>IP</th>
-                        <th>Plan</th>
-                        <th>Deploys</th>
-                        <th>Visits</th>
-                        <th>Action</th>
-                    </tr>
-            `;
-            users.forEach(user => {
-                const lastIp = user.lastIp || '-';
-                const visits = user.totalVisits || 0;
-                html += `
-                    <tr>
-                        <td>${user.email}</td>
-                        <td><strong>${user.discord || '-'}</strong></td>
-                        <td><span class="ip-badge">${lastIp}</span></td>
-                        <td><span class="status-badge ${user.plan}">${user.plan.toUpperCase()}</span></td>
-                        <td>${user.dailyDeploys || 0}</td>
-                        <td>${visits}</td>
-                        <td>
-                            <select class="plan-select" data-userid="${user.id}" id="plan-${user.id}">
-                                <option value="free" ${user.plan === 'free' ? 'selected' : ''}>Free</option>
-                                <option value="pro" ${user.plan === 'pro' ? 'selected' : ''}>Pro</option>
-                                <option value="elite" ${user.plan === 'elite' ? 'selected' : ''}>Elite</option>
-                                <option value="lifetime" ${user.plan === 'lifetime' ? 'selected' : ''}>Lifetime</option>
-                            </select>
-                            <button class="btn-save" onclick="updatePlan('${user.id}')">Save</button>
-                        </td>
-                    </tr>
-                `;
-            });
-            html += '</table>';
-            list.innerHTML = html;
-        }
+        function filterUsers(){const s=document.getElementById('searchInput').value.toLowerCase();const f=allUsers.filter(u=>u.email.toLowerCase().includes(s)||(u.discord&&u.discord.toLowerCase().includes(s)));renderUsers(f)}
 
-        function filterUsers() {
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allUsers.filter(u => 
-                u.email.toLowerCase().includes(search) || 
-                (u.discord && u.discord.toLowerCase().includes(search))
-            );
-            renderUsers(filtered);
-        }
+        window.updatePlan=async(userId)=>{const select=document.getElementById('plan-'+userId);const plan=select.value;try{const r=await fetch(API_URL+'/api/admin/user/'+userId+'/plan',{method:'PUT',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({plan})});const d=await r.json();if(r.ok){alert('✅ Plan updated to '+plan.toUpperCase());loadUsers()}else{alert('❌ '+(d.error||'Update failed'))}}catch(e){alert('❌ Network error')}};
 
-        window.updatePlan = async (userId) => {
-            const select = document.getElementById('plan-' + userId);
-            const plan = select.value;
-            try {
-                const res = await fetch(API_URL + '/api/admin/user/' + userId + '/plan', {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ plan })
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    alert('✅ Plan updated to ' + plan.toUpperCase());
-                    loadUsers();
-                } else {
-                    alert('❌ ' + (data.error || 'Update failed'));
-                }
-            } catch (e) {
-                alert('❌ Network error');
-            }
-        };
-
-        function logout() {
-            localStorage.removeItem('adminToken');
-            window.location.href = 'admin-login.html';
-        }
+        function logout(){localStorage.removeItem('adminToken');window.location.href='admin-login.html'}
 
         loadUsers();
     </script>
