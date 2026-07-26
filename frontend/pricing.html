@@ -4,93 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pricing - AURELIXA</title>
-    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#0a0e1a;color:#c8d6e5;font-family:'Segoe UI',sans-serif;padding:20px;min-height:100vh}
-        .container{max-width:600px;width:100%;margin:0 auto;background:#111b2e;border:1px solid #1a2a4a;border-radius:24px;padding:40px;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
-        .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:10px}
-        .header h1{font-size:2rem;color:#4a9eff}
-        .header a{color:#4a5a6a;text-decoration:none;font-size:0.9rem}
-        .header a:hover{color:#4a9eff}
-        .pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
-        .plan{background:#0a0e1a;border:1px solid #1a2a4a;border-radius:14px;padding:20px 15px;text-align:center;transition:0.3s}
-        .plan:hover{border-color:#4a9eff;transform:translateY(-4px)}
-        .plan.popular{border-color:#4a9eff;background:#0d1a2a}
-        .plan .badge{display:inline-block;background:#4a9eff;color:#0a0e1a;padding:1px 12px;border-radius:20px;font-size:0.55rem;font-weight:700;text-transform:uppercase;margin-bottom:6px}
-        .plan .name{color:#c8d6e5;font-weight:700;font-size:1.1rem}
-        .plan .price{color:#4a9eff;font-weight:900;font-size:1.8rem}
-        .plan .price span{color:#6a8aaa;font-size:0.7rem;font-weight:400}
-        .plan .features{color:#4a5a6a;font-size:0.75rem;margin:10px 0;line-height:1.8}
-        .plan .btn{background:#4a9eff;color:#0a0e1a;border:none;padding:8px 16px;border-radius:8px;font-size:0.8rem;font-weight:700;cursor:pointer;transition:0.3s;width:100%}
-        .plan .btn:hover{background:#6ab0ff}
-        .plan .btn.outline{background:transparent;border:1px solid #4a9eff;color:#4a9eff}
-        .plan .btn.outline:hover{background:#1a2a4a}
-        .footer{color:#4a5a6a;text-align:center;font-size:0.8rem;margin-top:25px;padding-top:15px;border-top:1px solid #0d1a2a}
-        .footer a{color:#4a9eff;text-decoration:none}
-        @media(max-width:500px){.pricing-grid{grid-template-columns:1fr}}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>💰 Pricing</h1>
-            <a href="index.html">← Back</a>
-        </div>
-
-        <div class="pricing-grid">
-            <div class="plan">
-                <div class="name">Free</div>
-                <div class="price">$0 <span>/forever</span></div>
-                <div class="features">
-                    ⚡ 2 deploys/day<br>
-                    ⏰ 1 hour expiry<br>
-                    📊 Basic stats
-                </div>
-                <button class="btn outline" onclick="window.location.href='register.html'">Get Started</button>
-            </div>
-
-            <div class="plan popular">
-                <div class="badge">🔥 POPULAR</div>
-                <div class="name">Pro</div>
-                <div class="price">$9.99 <span>/month</span></div>
-                <div class="features">
-                    ⚡ 10 deploys/day<br>
-                    ⏰ 24 hour expiry<br>
-                    🛡️ VPN Detection<br>
-                    📊 Full logs
-                </div>
-                <button class="btn" onclick="alert('💳 Contact @briefjes on Discord to upgrade')">Upgrade</button>
-            </div>
-
-            <div class="plan">
-                <div class="name">Elite</div>
-                <div class="price">$15 <span>/month</span></div>
-                <div class="features">
-                    ⚡ 50 deploys/day<br>
-                    ⏰ 48 hour expiry<br>
-                    🛡️ VPN Detection<br>
-                    🎨 Custom branding
-                </div>
-                <button class="btn outline" onclick="alert('💳 Contact @briefjes on Discord to upgrade')">Upgrade</button>
-            </div>
-
-            <div class="plan">
-                <div class="name">Lifetime</div>
-                <div class="price">$25 <span>/one-time</span></div>
-                <div class="features">
-                    ⚡ Unlimited deploys<br>
-                    ⏰ Forever active<br>
-                    🛡️ All features<br>
-                    👑 Priority support
-                </div>
-                <button class="btn outline" onclick="alert('💳 Contact @briefjes on Discord to upgrade')">Get</button>
-            </div>
-        </div>
-
-        <div class="footer">
-            💬 Contact <a href="https://discord.com/users/briefjes">@briefjes</a> on Discord
-        </div>
-    </div>
-</body>
-</html>
+        body{background:#0a0a0f;color:#e8e8e8;font-family:'Inter',sans-serif;padding:24px;min-height:100vh;position:relative}
+        body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(124,58,237,0.04) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(124,58,237,0.03) 0%,transparent 60%);pointer-events:none;z-index:0}
+        .container{max-width:600px;margin:0 auto;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:24px;padding:40px;backdrop-filter:blur(10px);position:relative;z-index:1;transition:all 0.4s ease}
+        .container:hover{border-color:rgba(124,58,237,0.08)}
+        .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:10px}
+        .header h1{font-size:2rem;font-weight:900;background:linear-gradient(135deg,#7c3aed 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .header a{color:#444466;text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.3s}
+        .header a:hover{color:#a78bfa}
+        .pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+        .plan{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:14px;padding:20px 16px;text-align:center;transition:all 0.4s ease}
+        .plan:hover{border-color:rgba(124,58,237,0.15);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.2)}
+        .plan.popular{border-color:rgba(124,58,237,0.15);background:rgba(124,58,237,0.03)}
+        .plan .badge{display:inline-block;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;padding:1px 14px;border-radius:20px;font-size:0.5rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+        .plan .name{color:#e8e8e8;font-weight:700;font-size:1rem}
+        .plan .price{color:#a78bfa;font-weight:900;font-size:1.8rem}
+        .plan .price span{color:#666688;font-size:0.7rem;font-weight:400}
+        .plan .features{color:#666688;font-size:0.7rem;margin:10px 0;line-height:1.8}
+        .plan .btn{background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.3s ease;font-family:inherit;width:100%;box-shadow:0 4px 15px rgba(124,58,237,0.1)}
+        .plan .btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(124,58,237,0.2)}
+        .plan .btn.outline{background:transparent;border:1px solid rgba(124,58,237,0.2);color:#a78bfa;box-shadow:none}
+        .plan .btn.outline:hover{background:rgba(124,58,237,0.04);border-color:rgba(124,58,237,0.3)}
+        .footer{color:#444466;text-align:center;font-size:0.75rem;margin-top:28px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.03)}
+        .footer a{color:#a78bfa;text-decoration:none}
+        .footer a:hover{
