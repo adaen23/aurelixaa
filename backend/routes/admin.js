@@ -3,13 +3,12 @@ const User = require('../models/User');
 const Deployment = require('../models/Deployment');
 const router = express.Router();
 
-// Admin token (wordt gebruikt voor authenticatie)
+// Admin token
 const ADMIN_TOKEN = 'admin-token-123';
 
 // ===== ADMIN LOGIN =====
 router.post('/login', (req, res) => {
   const { username, password } = req.body;
-  // Gebruik .env variabelen!
   if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
     return res.json({ token: ADMIN_TOKEN });
   }
@@ -46,7 +45,7 @@ router.put('/user/:userId/plan', checkAdminToken, async (req, res) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
     user.plan = req.body.plan;
     await user.save();
-    res.json({ success: true });
+    res.json({ success: true, plan: user.plan });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -59,7 +58,7 @@ router.put('/user/:userId/role', checkAdminToken, async (req, res) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
     user.role = req.body.role;
     await user.save();
-    res.json({ success: true });
+    res.json({ success: true, role: user.role });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -81,15 +80,25 @@ router.delete('/user/:userId', checkAdminToken, async (req, res) => {
 router.post('/blacklist', checkAdminToken, async (req, res) => {
   try {
     const { ip } = req.body;
-    if (!ip || ip === 'unknown' || ip === '-') {
-      return res.status(400).json({ error: 'Invalid IP' });
+    console.log('🚫 Blacklist IP:', ip);
+    
+    if (!ip || ip === 'unknown' || ip === '-' || ip === '') {
+      return res.status(400).json({ error: 'Invalid IP address. User has no IP stored.' });
     }
+    
     const users = await User.find({ lastIp: ip });
+    if (users.length === 0) {
+      return res.status(404).json({ error: 'No users found with this IP' });
+    }
+    
+    let count = 0;
     for (const u of users) {
       u.blacklisted = true;
       await u.save();
+      count++;
     }
-    res.json({ success: true, count: users.length });
+    
+    res.json({ success: true, count, message: `Blacklisted ${count} users with IP ${ip}` });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
