@@ -6,26 +6,35 @@
     <title>AURELIXA</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#f0f8ff;min-height:100vh;display:flex;justify-content:center;align-items:center;font-family:'Segoe UI',sans-serif;padding:20px}
-        .container{max-width:500px;width:100%;background:white;border-radius:20px;padding:50px;box-shadow:0 20px 60px rgba(0,0,0,0.08);text-align:center}
-        h1{font-size:3rem;color:#1a5a8c;margin-bottom:10px}
-        .sub{color:#6a8aaa;margin-bottom:30px;font-size:1.1rem}
-        .btn{display:block;width:100%;padding:16px;margin-bottom:15px;border-radius:10px;border:none;font-size:1.1rem;font-weight:600;cursor:pointer;text-decoration:none;text-align:center;transition:0.3s}
-        .btn-primary{background:#4a90d9;color:white}
-        .btn-primary:hover{background:#3a7ac4}
-        .btn-outline{background:transparent;color:#4a90d9;border:2px solid #4a90d9}
-        .btn-outline:hover{background:#f0f8ff}
-        .footer{color:#8aabba;font-size:0.8rem;margin-top:20px}
-        .footer a{color:#4a90d9;text-decoration:none}
+        body{background:#0a0e1a;min-height:100vh;display:flex;justify-content:center;align-items:center;font-family:'Segoe UI',sans-serif;padding:20px}
+        .container{max-width:480px;width:100%;background:#111b2e;border:1px solid #1a2a4a;border-radius:24px;padding:50px;box-shadow:0 20px 60px rgba(0,0,0,0.5);text-align:center}
+        .logo{font-size:4rem;color:#4a9eff;font-weight:900;text-shadow:0 0 40px rgba(74,158,255,0.1);margin-bottom:5px;letter-spacing:3px}
+        .sub{color:#6a8aaa;font-size:1.1rem;margin-bottom:30px;font-weight:300}
+        .sub span{color:#4a9eff;font-weight:600}
+        .btn-group{display:flex;flex-direction:column;gap:12px}
+        .btn{display:block;width:100%;padding:16px;border-radius:12px;border:none;font-size:1.1rem;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;transition:0.3s}
+        .btn-primary{background:#4a9eff;color:#0a0e1a}
+        .btn-primary:hover{background:#6ab0ff;transform:scale(1.02)}
+        .btn-outline{background:transparent;color:#4a9eff;border:2px solid #4a9eff}
+        .btn-outline:hover{background:#1a2a4a;transform:scale(1.02)}
+        .footer{color:#4a5a6a;font-size:0.8rem;margin-top:25px;padding-top:20px;border-top:1px solid #0d1a2a}
+        .footer a{color:#4a9eff;text-decoration:none}
+        .footer a:hover{text-decoration:underline}
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>AURELIXA</h1>
-        <div class="sub">Grabber as a Service</div>
-        <a href="login.html" class="btn btn-primary">Login</a>
-        <a href="register.html" class="btn btn-outline">Create Account</a>
-        <div class="footer">Contact <a href="https://discord.com/users/briefjes">@briefjes</a> on Discord for support</div>
+        <div class="logo">AURELIXA</div>
+        <div class="sub">Grabber as a <span>Service</span></div>
+
+        <div class="btn-group">
+            <a href="login.html" class="btn btn-primary">🔓 Login</a>
+            <a href="register.html" class="btn btn-outline">🚀 Create Account</a>
+        </div>
+
+        <div class="footer">
+            💬 Contact <a href="https://discord.com/users/briefjes">@briefjes</a> on Discord
+        </div>
     </div>
 </body>
 </html>
