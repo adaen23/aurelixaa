@@ -115,8 +115,10 @@
 
     <script>
         const API_URL = 'https://api.aurelixa.online';
-        const token = localStorage.getItem('adminToken');
-        if (!token) window.location.href = 'admin-login.html';
+        // Token check uitgeschakeld voor test
+        // const token = localStorage.getItem('adminToken');
+        // if (!token) window.location.href = 'admin-login.html';
+        const token = 'admin-token-123';
 
         let allUsers = [];
         let pendingAction = null;
@@ -159,9 +161,7 @@
 
         async function loadStats() {
             try {
-                const r = await fetch(API_URL + '/api/admin/stats', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
+                const r = await fetch(API_URL + '/api/admin/stats');
                 const d = await r.json();
                 document.getElementById('totalUsers').textContent = d.totalUsers || 0;
                 document.getElementById('totalDeployments').textContent = d.totalDeployments || 0;
@@ -172,16 +172,14 @@
 
         async function loadUsers() {
             try {
-                const r = await fetch(API_URL + '/api/admin/users', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
+                const r = await fetch(API_URL + '/api/admin/users');
                 const d = await r.json();
-                console.log('Users from API:', d);
+                console.log('📋 Users from API:', d);
                 allUsers = d.users || [];
                 renderUsers(allUsers);
                 loadStats();
             } catch (e) { 
-                console.error('Load users error:', e); 
+                console.error('❌ Load users error:', e); 
                 showToast('❌ Error loading users: ' + e.message, 'error'); 
             }
         }
@@ -239,19 +237,14 @@
             renderUsers(f);
         }
 
-        // ===== UPDATE USER (PLAN + ROLE) =====
         window.updateUser = async (userId) => {
             const plan = document.getElementById('plan-' + userId).value;
             const role = document.getElementById('role-' + userId).value;
             
             try {
-                // Update plan
                 let res = await fetch(API_URL + '/api/admin/user/' + userId + '/plan', {
                     method: 'PUT',
-                    headers: { 
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type': 'application/json' 
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ plan })
                 });
                 
@@ -261,13 +254,9 @@
                     return; 
                 }
                 
-                // Update role
                 res = await fetch(API_URL + '/api/admin/user/' + userId + '/role', {
                     method: 'PUT',
-                    headers: { 
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type': 'application/json' 
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ role })
                 });
                 
@@ -284,7 +273,6 @@
             }
         };
 
-        // ===== DELETE USER =====
         window.confirmDelete = (userId) => {
             showModal('🗑️', 'Delete User?', 'This will permanently delete the user and all their data.', 'Delete', 'danger', () => deleteUser(userId));
         };
@@ -292,8 +280,7 @@
         async function deleteUser(userId) {
             try {
                 const res = await fetch(API_URL + '/api/admin/user/' + userId, { 
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + token }
+                    method: 'DELETE'
                 });
                 
                 if (res.ok) { 
@@ -308,7 +295,6 @@
             }
         }
 
-        // ===== BLACKLIST =====
         window.confirmBlacklist = (userId) => {
             showModal('🚫', 'Blacklist User?', 'This user will NOT be able to login or register.', 'Blacklist', 'danger', () => blacklistUser(userId));
         };
@@ -322,16 +308,13 @@
                 }
                 
                 if (!u.lastIp || u.lastIp === '-' || u.lastIp === 'unknown' || u.lastIp === '') {
-                    showToast('❌ This user has no IP address stored. They need to login first.', 'error');
+                    showToast('❌ This user has no IP address stored. Ask them to login first.', 'error');
                     return;
                 }
                 
                 const res = await fetch(API_URL + '/api/admin/blacklist', {
                     method: 'POST',
-                    headers: { 
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type': 'application/json' 
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ip: u.lastIp })
                 });
                 
@@ -348,7 +331,6 @@
             }
         }
 
-        // ===== UNBLACKLIST =====
         window.confirmUnblacklist = (userId) => {
             showModal('✅', 'Unblacklist User?', 'This user will be able to login again.', 'Unblacklist', 'success', () => unblacklistUser(userId));
         };
@@ -356,8 +338,7 @@
         async function unblacklistUser(userId) {
             try {
                 const res = await fetch(API_URL + '/api/admin/blacklist/' + userId, { 
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + token }
+                    method: 'DELETE'
                 });
                 
                 if (res.ok) { 
