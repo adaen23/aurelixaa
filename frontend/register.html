@@ -7,63 +7,64 @@
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{background:#0a0e1a;min-height:100vh;display:flex;justify-content:center;align-items:center;font-family:'Segoe UI',sans-serif;padding:20px}
-        .container{max-width:420px;width:100%;background:#111b2e;border:1px solid #1a2a4a;border-radius:20px;padding:40px;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
-        h1{font-size:2.5rem;color:#4a9eff;text-align:center;text-shadow:0 0 30px rgba(74,158,255,0.15)}
-        .sub{color:#6a8aaa;text-align:center;margin-bottom:30px;font-size:0.95rem}
-        .input-group{position:relative;margin-bottom:15px}
+        .container{max-width:400px;width:100%;background:#111b2e;border:1px solid #1a2a4a;border-radius:24px;padding:40px;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+        .back{color:#4a5a6a;text-decoration:none;font-size:0.85rem;display:inline-block;margin-bottom:15px}
+        .back:hover{color:#4a9eff}
+        .logo{font-size:2.5rem;color:#4a9eff;font-weight:900;text-align:center;margin-bottom:5px}
+        .sub{color:#6a8aaa;text-align:center;font-size:0.95rem;margin-bottom:25px}
+        .input-group{margin-bottom:15px}
         .input-group label{color:#6a8aaa;font-size:0.8rem;display:block;margin-bottom:5px}
+        .input-group label .required{color:#ff4757}
         .input-group input{width:100%;padding:14px;background:#0a0e1a;border:1px solid #1a2a4a;border-radius:10px;color:#c8d6e5;font-size:1rem;transition:0.3s}
         .input-group input:focus{outline:none;border-color:#4a9eff;box-shadow:0 0 20px rgba(74,158,255,0.1)}
-        .input-group .required{color:#ff4757;font-size:0.7rem;margin-left:5px}
         .btn{width:100%;padding:16px;background:#4a9eff;color:#0a0e1a;border:none;border-radius:10px;font-size:1.1rem;font-weight:700;cursor:pointer;transition:0.3s}
         .btn:hover{background:#6ab0ff;transform:scale(1.02)}
-        .link{color:#6a8aaa;text-align:center;margin-top:20px;display:block;font-size:0.9rem}
-        .link a{color:#4a9eff;text-decoration:none}
-        .link a:hover{text-decoration:underline}
         .error{color:#ff4757;text-align:center;margin-top:10px;font-size:0.9rem}
         .success{color:#4eff6a;text-align:center;margin-top:10px;font-size:0.9rem}
+        .footer{color:#4a5a6a;text-align:center;font-size:0.8rem;margin-top:20px;padding-top:15px;border-top:1px solid #0d1a2a}
+        .footer a{color:#4a9eff;text-decoration:none}
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>AURELIXA</h1>
+        <a href="index.html" class="back">← Back</a>
+        <div class="logo">AURELIXA</div>
         <div class="sub">Create your account</div>
-        <form id="registerForm">
-            <div class="input-group">
-                <label>Email <span class="required">*</span></label>
-                <input type="email" id="email" placeholder="your@email.com" required>
-            </div>
-            <div class="input-group">
-                <label>Discord Username <span class="required">*</span></label>
-                <input type="text" id="discord" placeholder="@username" required>
-            </div>
-            <div class="input-group">
-                <label>Password <span class="required">*</span></label>
-                <input type="password" id="password" placeholder="Min 6 characters" required minlength="6">
-            </div>
-            <button type="submit" class="btn">🚀 Create Account</button>
-        </form>
-        <div id="error" class="error"></div>
-        <div id="success" class="success"></div>
-        <div class="link">Already have an account? <a href="login.html">Login</a></div>
-        <div class="link" style="margin-top:10px;font-size:0.8rem;color:#4a5a6a">Need support? Contact @briefjes on Discord</div>
+
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="regEmail" placeholder="your@email.com">
+        </div>
+        <div class="input-group">
+            <label>Discord Username <span class="required">*</span></label>
+            <input type="text" id="regDiscord" placeholder="@username">
+        </div>
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="regPassword" placeholder="Min 6 characters">
+        </div>
+        <button class="btn" onclick="register()">🚀 Create Account</button>
+        <div id="regError" class="error"></div>
+        <div id="regSuccess" class="success"></div>
+
+        <div class="footer">
+            Already have an account? <a href="login.html">Login</a>
+        </div>
     </div>
     <script>
         const API_URL = 'https://api.aurelixa.online';
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const discord = document.getElementById('discord').value;
-            const password = document.getElementById('password').value;
-            
-            document.getElementById('error').textContent = '';
-            document.getElementById('success').textContent = '';
-            
+        async function register() {
+            const email = document.getElementById('regEmail').value;
+            const discord = document.getElementById('regDiscord').value;
+            const password = document.getElementById('regPassword').value;
+            const error = document.getElementById('regError');
+            const success = document.getElementById('regSuccess');
+            error.textContent = '';
+            success.textContent = '';
             if (!discord.trim()) {
-                document.getElementById('error').textContent = '❌ Discord username is required';
+                error.textContent = '❌ Discord username is required';
                 return;
             }
-            
             try {
                 const res = await fetch(API_URL + '/api/auth/register', {
                     method: 'POST',
@@ -72,16 +73,18 @@
                 });
                 const data = await res.json();
                 if (!res.ok) {
-                    document.getElementById('error').textContent = '❌ ' + (data.error || 'Registration failed');
+                    error.textContent = '❌ ' + (data.error || 'Registration failed');
                     return;
                 }
                 localStorage.setItem('token', data.token);
-                document.getElementById('success').textContent = '✅ Registration successful! Redirecting...';
+                localStorage.setItem('userEmail', data.user.email);
+                success.textContent = '✅ Registration successful! Redirecting...';
                 setTimeout(() => window.location.href = 'dashboard.html', 1500);
             } catch (e) {
-                document.getElementById('error').textContent = '❌ Network error';
+                error.textContent = '❌ Network error';
             }
-        });
+        }
+        document.addEventListener('keydown', (e) => { if (e.key === 'Enter') register(); });
     </script>
 </body>
 </html>
