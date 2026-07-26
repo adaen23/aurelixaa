@@ -212,20 +212,20 @@
                     <td>${visits}</td>
                     <td class="${bl ? 'blacklisted-true' : 'blacklisted-false'}">${bl ? '⚠️ YES' : '✅ NO'}</td>
                     <td><div class="action-cell">
-                        <select class="plan-select" id="plan-${u.id}">
+                        <select class="plan-select" id="plan-${u._id}">
                             <option value="free" ${u.plan === 'free' ? 'selected' : ''}>Free</option>
                             <option value="pro" ${u.plan === 'pro' ? 'selected' : ''}>Pro</option>
                             <option value="elite" ${u.plan === 'elite' ? 'selected' : ''}>Elite</option>
                             <option value="lifetime" ${u.plan === 'lifetime' ? 'selected' : ''}>Lifetime</option>
                         </select>
-                        <select class="role-select" id="role-${u.id}">
+                        <select class="role-select" id="role-${u._id}">
                             <option value="user" ${(u.role || 'user') === 'user' ? 'selected' : ''}>User</option>
                             <option value="mod" ${u.role === 'mod' ? 'selected' : ''}>Mod</option>
                             <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
                         </select>
-                        <button class="btn-save" onclick="updateUser('${u.id}')">Save</button>
-                        ${bl ? `<button class="btn-unblacklist" onclick="confirmUnblacklist('${u.id}')">Unblacklist</button>` : `<button class="btn-blacklist" onclick="confirmBlacklist('${u.id}')">Blacklist</button>`}
-                        <button class="btn-delete" onclick="confirmDelete('${u.id}')">Delete</button>
+                        <button class="btn-save" onclick="updateUser('${u._id}')">Save</button>
+                        ${bl ? `<button class="btn-unblacklist" onclick="confirmUnblacklist('${u._id}')">Unblacklist</button>` : `<button class="btn-blacklist" onclick="confirmBlacklist('${u._id}')">Blacklist</button>`}
+                        <button class="btn-delete" onclick="confirmDelete('${u._id}')">Delete</button>
                     </div></td>
                 </tr>`;
             });
@@ -311,7 +311,7 @@
 
         async function blacklistUser(userId) {
             try {
-                const u = allUsers.find(x => x.id === userId);
+                const u = allUsers.find(x => x._id === userId);
                 if (!u || !u.lastIp || u.lastIp === '-' || u.lastIp === 'unknown') {
                     showToast('❌ No valid IP address found for this user', 'error');
                     return;
