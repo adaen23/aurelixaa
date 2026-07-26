@@ -9,456 +9,76 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: #0a0a0f;
-            color: #e8e8e8;
-            font-family: 'Inter', sans-serif;
-            padding: 20px;
-            min-height: 100vh;
-            position: relative;
-        }
-        body::before {
-            content: '';
-            position: fixed;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(ellipse at 30% 20%, rgba(124, 58, 237, 0.04) 0%, transparent 60%),
-                radial-gradient(ellipse at 70% 80%, rgba(124, 58, 237, 0.03) 0%, transparent 60%);
-            pointer-events: none;
-            z-index: 0;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 24px;
-            padding: 28px 32px;
-            backdrop-filter: blur(10px);
-            position: relative;
-            z-index: 1;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 14px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .header h1 {
-            font-size: 1.8rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .header a {
-            color: #666688;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-        .header a:hover { color: #a78bfa; }
-        .header .btn-logout {
-            background: transparent;
-            color: #666688;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            padding: 6px 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.8rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin-left: 12px;
-        }
-        .header .btn-logout:hover {
-            background: rgba(255, 255, 255, 0.03);
-            color: #a78bfa;
-        }
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-        .stat-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 12px;
-            padding: 16px 14px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-        .stat-card:hover {
-            border-color: rgba(124, 58, 237, 0.1);
-            transform: translateY(-2px);
-        }
-        .stat-card .number {
-            font-size: 2rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .stat-card .label {
-            color: #666688;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 4px;
-        }
-        .users-table { overflow-x: auto; }
-        .users-table h2 {
-            color: #a78bfa;
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-        }
-        th {
-            text-align: left;
-            padding: 10px 8px;
-            color: #a78bfa;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            font-weight: 600;
-        }
-        td {
-            padding: 10px 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            color: #c8c8e8;
-            vertical-align: middle;
-        }
-        .ip-badge {
-            background: rgba(255, 255, 255, 0.04);
-            padding: 2px 12px;
-            border-radius: 20px;
-            font-size: 0.65rem;
-            font-weight: 500;
-            font-family: monospace;
-            color: #8888aa;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-        }
-        .role-badge {
-            padding: 2px 12px;
-            border-radius: 20px;
-            font-size: 0.6rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            display: inline-block;
-        }
-        .role-badge.user {
-            background: rgba(255, 255, 255, 0.04);
-            color: #666688;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-        }
-        .role-badge.mod {
-            background: rgba(124, 58, 237, 0.15);
-            color: #a78bfa;
-            border: 1px solid rgba(124, 58, 237, 0.1);
-        }
-        .role-badge.admin {
-            background: rgba(241, 196, 15, 0.15);
-            color: #f1c40f;
-            border: 1px solid rgba(241, 196, 15, 0.1);
-        }
-        .plan-select,
-        .role-select {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 6px;
-            padding: 4px 10px;
-            color: #e8e8e8;
-            font-size: 0.75rem;
-            font-family: inherit;
-            transition: all 0.3s ease;
-        }
-        .plan-select:focus,
-        .role-select:focus {
-            outline: none;
-            border-color: rgba(124, 58, 237, 0.3);
-        }
-        .plan-select option,
-        .role-select option {
-            background: #1a1a2e;
-            color: #e8e8e8;
-        }
-        .btn-save {
-            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-            color: #fff;
-            border: none;
-            padding: 4px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.7rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-        .btn-save:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.25);
-        }
-        .btn-delete {
-            background: rgba(231, 76, 94, 0.1);
-            color: #e74c5e;
-            border: 1px solid rgba(231, 76, 94, 0.15);
-            padding: 4px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.7rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-        .btn-delete:hover {
-            background: rgba(231, 76, 94, 0.2);
-            border-color: rgba(231, 76, 94, 0.3);
-        }
-        .btn-blacklist {
-            background: rgba(231, 76, 94, 0.08);
-            color: #e74c5e;
-            border: 1px solid rgba(231, 76, 94, 0.1);
-            padding: 4px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.7rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-        .btn-blacklist:hover {
-            background: rgba(231, 76, 94, 0.15);
-            border-color: rgba(231, 76, 94, 0.2);
-        }
-        .btn-unblacklist {
-            background: rgba(78, 255, 106, 0.08);
-            color: #4eff6a;
-            border: 1px solid rgba(78, 255, 106, 0.1);
-            padding: 4px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.7rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-        .btn-unblacklist:hover {
-            background: rgba(78, 255, 106, 0.15);
-            border-color: rgba(78, 255, 106, 0.2);
-        }
-        .search-box {
-            width: 100%;
-            padding: 10px 16px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 10px;
-            color: #e8e8e8;
-            font-size: 0.9rem;
-            font-family: inherit;
-            margin-bottom: 14px;
-            transition: all 0.3s ease;
-        }
-        .search-box:focus {
-            outline: none;
-            border-color: rgba(124, 58, 237, 0.2);
-        }
-        .search-box::placeholder { color: #333355; }
-        .empty {
-            color: #444466;
-            text-align: center;
-            padding: 30px;
-            font-size: 0.9rem;
-        }
-        .action-cell {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            flex-wrap: wrap;
-        }
-        .status-badge {
-            padding: 2px 12px;
-            border-radius: 20px;
-            font-size: 0.6rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            display: inline-block;
-        }
-        .status-badge.free {
-            background: rgba(255, 255, 255, 0.04);
-            color: #666688;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-        }
-        .status-badge.pro {
-            background: rgba(124, 58, 237, 0.15);
-            color: #a78bfa;
-            border: 1px solid rgba(124, 58, 237, 0.1);
-        }
-        .status-badge.elite {
-            background: rgba(124, 58, 237, 0.15);
-            color: #a78bfa;
-            border: 1px solid rgba(124, 58, 237, 0.1);
-        }
-        .status-badge.lifetime {
-            background: rgba(241, 196, 15, 0.1);
-            color: #f1c40f;
-            border: 1px solid rgba(241, 196, 15, 0.1);
-        }
-        .blacklisted-true { color: #e74c5e; font-weight: 600; }
-        .blacklisted-false { color: #4eff6a; }
-
-        /* --- Toast --- */
-        .toast-container {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-        .toast {
-            padding: 14px 28px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            font-family: 'Inter', sans-serif;
-            backdrop-filter: blur(10px);
-            animation: slideUp 0.4s ease;
-            min-width: 200px;
-            text-align: center;
-        }
-        .toast.success {
-            background: rgba(78, 255, 106, 0.12);
-            border: 1px solid rgba(78, 255, 106, 0.2);
-            color: #4eff6a;
-        }
-        .toast.error {
-            background: rgba(231, 76, 94, 0.12);
-            border: 1px solid rgba(231, 76, 94, 0.2);
-            color: #e74c5e;
-        }
-        .toast.info {
-            background: rgba(124, 58, 237, 0.12);
-            border: 1px solid rgba(124, 58, 237, 0.2);
-            color: #a78bfa;
-        }
-        @keyframes slideUp {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- Modal --- */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(6px);
-            z-index: 999;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-overlay.show { display: flex; }
-        .modal-box {
-            background: #14141e;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 20px;
-            padding: 32px 36px;
-            max-width: 440px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        }
-        .modal-box .icon {
-            font-size: 3rem;
-            margin-bottom: 12px;
-        }
-        .modal-box h3 {
-            color: #e8e8e8;
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        .modal-box p {
-            color: #8888aa;
-            font-size: 0.85rem;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-        .modal-box .modal-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-        .modal-box .modal-actions button {
-            padding: 10px 28px;
-            border-radius: 10px;
-            border: none;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-        .modal-box .modal-actions .btn-cancel {
-            background: rgba(255, 255, 255, 0.04);
-            color: #8888aa;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-        }
-        .modal-box .modal-actions .btn-cancel:hover {
-            background: rgba(255, 255, 255, 0.08);
-        }
-        .modal-box .modal-actions .btn-confirm {
-            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-            color: #fff;
-            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.2);
-        }
-        .modal-box .modal-actions .btn-confirm:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(124, 58, 237, 0.3);
-        }
-        .modal-box .modal-actions .btn-danger {
-            background: linear-gradient(135deg, #e74c5e 0%, #c0392b 100%);
-            color: #fff;
-            box-shadow: 0 4px 20px rgba(231, 76, 94, 0.2);
-        }
-        .modal-box .modal-actions .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(231, 76, 94, 0.3);
-        }
-        .modal-box .modal-actions .btn-success {
-            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-            color: #fff;
-            box-shadow: 0 4px 20px rgba(46, 204, 113, 0.2);
-        }
-        .modal-box .modal-actions .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(46, 204, 113, 0.3);
-        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:#0a0a0f;color:#e8e8e8;font-family:'Inter',sans-serif;padding:20px;min-height:100vh;position:relative}
+        body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(124,58,237,0.04) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(124,58,237,0.03) 0%,transparent 60%);pointer-events:none;z-index:0}
+        .container{max-width:1200px;margin:0 auto;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:24px;padding:28px 32px;backdrop-filter:blur(10px);position:relative;z-index:1}
+        .header{display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.04);margin-bottom:24px;flex-wrap:wrap;gap:12px}
+        .header h1{font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,#7c3aed 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .header a{color:#666688;text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.3s}
+        .header a:hover{color:#a78bfa}
+        .header .btn-logout{background:transparent;color:#666688;border:1px solid rgba(255,255,255,0.06);padding:6px 18px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.8rem;font-weight:600;transition:all 0.3s ease;margin-left:12px}
+        .header .btn-logout:hover{background:rgba(255,255,255,0.03);color:#a78bfa}
+        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:24px}
+        .stat-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:12px;padding:16px 14px;text-align:center;transition:all 0.3s ease}
+        .stat-card:hover{border-color:rgba(124,58,237,0.1);transform:translateY(-2px)}
+        .stat-card .number{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#7c3aed 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .stat-card .label{color:#666688;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px}
+        .users-table{overflow-x:auto}
+        .users-table h2{color:#a78bfa;font-size:1rem;font-weight:700;margin-bottom:12px}
+        table{width:100%;border-collapse:collapse;font-size:0.8rem}
+        th{text-align:left;padding:10px 8px;color:#a78bfa;border-bottom:1px solid rgba(255,255,255,0.06);font-weight:600}
+        td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,0.03);color:#c8c8e8;vertical-align:middle}
+        .ip-badge{background:rgba(255,255,255,0.04);padding:2px 12px;border-radius:20px;font-size:0.65rem;font-weight:500;font-family:monospace;color:#8888aa;border:1px solid rgba(255,255,255,0.04)}
+        .role-badge{padding:2px 12px;border-radius:20px;font-size:0.6rem;font-weight:600;text-transform:uppercase;display:inline-block}
+        .role-badge.user{background:rgba(255,255,255,0.04);color:#666688;border:1px solid rgba(255,255,255,0.04)}
+        .role-badge.mod{background:rgba(124,58,237,0.15);color:#a78bfa;border:1px solid rgba(124,58,237,0.1)}
+        .role-badge.admin{background:rgba(241,196,15,0.15);color:#f1c40f;border:1px solid rgba(241,196,15,0.1)}
+        .plan-select,.role-select{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:4px 10px;color:#e8e8e8;font-size:0.75rem;font-family:inherit;transition:all 0.3s ease}
+        .plan-select:focus,.role-select:focus{outline:none;border-color:rgba(124,58,237,0.3)}
+        .plan-select option,.role-select option{background:#1a1a2e;color:#e8e8e8}
+        .btn-save{background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);color:#fff;border:none;padding:4px 14px;border-radius:6px;cursor:pointer;font-size:0.7rem;font-weight:600;transition:all 0.3s ease;font-family:inherit}
+        .btn-save:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(124,58,237,0.25)}
+        .btn-delete{background:rgba(231,76,94,0.1);color:#e74c5e;border:1px solid rgba(231,76,94,0.15);padding:4px 14px;border-radius:6px;cursor:pointer;font-size:0.7rem;font-weight:600;transition:all 0.3s ease;font-family:inherit}
+        .btn-delete:hover{background:rgba(231,76,94,0.2);border-color:rgba(231,76,94,0.3)}
+        .btn-blacklist{background:rgba(231,76,94,0.08);color:#e74c5e;border:1px solid rgba(231,76,94,0.1);padding:4px 14px;border-radius:6px;cursor:pointer;font-size:0.7rem;font-weight:600;transition:all 0.3s ease;font-family:inherit}
+        .btn-blacklist:hover{background:rgba(231,76,94,0.15);border-color:rgba(231,76,94,0.2)}
+        .btn-unblacklist{background:rgba(78,255,106,0.08);color:#4eff6a;border:1px solid rgba(78,255,106,0.1);padding:4px 14px;border-radius:6px;cursor:pointer;font-size:0.7rem;font-weight:600;transition:all 0.3s ease;font-family:inherit}
+        .btn-unblacklist:hover{background:rgba(78,255,106,0.15);border-color:rgba(78,255,106,0.2)}
+        .search-box{width:100%;padding:10px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;color:#e8e8e8;font-size:0.9rem;font-family:inherit;margin-bottom:14px;transition:all 0.3s ease}
+        .search-box:focus{outline:none;border-color:rgba(124,58,237,0.2)}
+        .search-box::placeholder{color:#333355}
+        .empty{color:#444466;text-align:center;padding:30px;font-size:0.9rem}
+        .action-cell{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+        .status-badge{padding:2px 12px;border-radius:20px;font-size:0.6rem;font-weight:600;text-transform:uppercase;display:inline-block}
+        .status-badge.free{background:rgba(255,255,255,0.04);color:#666688;border:1px solid rgba(255,255,255,0.04)}
+        .status-badge.pro{background:rgba(124,58,237,0.15);color:#a78bfa;border:1px solid rgba(124,58,237,0.1)}
+        .status-badge.elite{background:rgba(124,58,237,0.15);color:#a78bfa;border:1px solid rgba(124,58,237,0.1)}
+        .status-badge.lifetime{background:rgba(241,196,15,0.1);color:#f1c40f;border:1px solid rgba(241,196,15,0.1)}
+        .blacklisted-true{color:#e74c5e;font-weight:600}
+        .blacklisted-false{color:#4eff6a}
+        .toast-container{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);z-index:1000;display:flex;flex-direction:column;align-items:center;gap:8px}
+        .toast{padding:14px 28px;border-radius:12px;font-weight:600;font-size:0.9rem;font-family:'Inter',sans-serif;backdrop-filter:blur(10px);animation:slideUp 0.4s ease;min-width:200px;text-align:center}
+        .toast.success{background:rgba(78,255,106,0.12);border:1px solid rgba(78,255,106,0.2);color:#4eff6a}
+        .toast.error{background:rgba(231,76,94,0.12);border:1px solid rgba(231,76,94,0.2);color:#e74c5e}
+        .toast.info{background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.2);color:#a78bfa}
+        @keyframes slideUp{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+        .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:999;justify-content:center;align-items:center}
+        .modal-overlay.show{display:flex}
+        .modal-box{background:#14141e;border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:32px 36px;max-width:440px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+        .modal-box .icon{font-size:3rem;margin-bottom:12px}
+        .modal-box h3{color:#e8e8e8;font-size:1.2rem;font-weight:700;margin-bottom:8px}
+        .modal-box p{color:#8888aa;font-size:0.85rem;margin-bottom:20px;line-height:1.5}
+        .modal-box .modal-actions{display:flex;gap:12px;justify-content:center}
+        .modal-box .modal-actions button{padding:10px 28px;border-radius:10px;border:none;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.3s ease;font-family:inherit}
+        .modal-box .modal-actions .btn-cancel{background:rgba(255,255,255,0.04);color:#8888aa;border:1px solid rgba(255,255,255,0.06)}
+        .modal-box .modal-actions .btn-cancel:hover{background:rgba(255,255,255,0.08)}
+        .modal-box .modal-actions .btn-confirm{background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);color:#fff;box-shadow:0 4px 20px rgba(124,58,237,0.2)}
+        .modal-box .modal-actions .btn-confirm:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(124,58,237,0.3)}
+        .modal-box .modal-actions .btn-danger{background:linear-gradient(135deg,#e74c5e 0%,#c0392b 100%);color:#fff;box-shadow:0 4px 20px rgba(231,76,94,0.2)}
+        .modal-box .modal-actions .btn-danger:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(231,76,94,0.3)}
+        .modal-box .modal-actions .btn-success{background:linear-gradient(135deg,#2ecc71 0%,#27ae60 100%);color:#fff;box-shadow:0 4px 20px rgba(46,204,113,0.2)}
+        .modal-box .modal-actions .btn-success:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(46,204,113,0.3)}
     </style>
 </head>
 <body>
@@ -485,7 +105,6 @@
         </div>
     </div>
 
-    <!-- Modal -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-box">
             <div class="icon" id="modalIcon">⚠️</div>
@@ -498,7 +117,6 @@
         </div>
     </div>
 
-    <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
@@ -508,7 +126,6 @@
         let allUsers = [];
         let pendingAction = null;
 
-        // ===== TOAST =====
         function showToast(msg, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -522,7 +139,6 @@
             }, 3500);
         }
 
-        // ===== MODAL =====
         function showModal(icon, title, desc, confirmText, confirmClass, onConfirm) {
             document.getElementById('modalIcon').textContent = icon;
             document.getElementById('modalTitle').textContent = title;
@@ -546,7 +162,6 @@
             }
         }
 
-        // ===== LOAD DATA =====
         async function loadStats() {
             try {
                 const r = await fetch(API_URL + '/api/admin/stats', { headers: { 'Authorization': 'Bearer ' + token } });
@@ -555,7 +170,7 @@
                 document.getElementById('totalDeployments').textContent = d.totalDeployments || 0;
                 document.getElementById('activeDeployments').textContent = d.activeDeployments || 0;
                 document.getElementById('totalVisits').textContent = d.totalVisits || 0;
-            } catch (e) {}
+            } catch (e) { console.error(e); }
         }
 
         async function loadUsers() {
@@ -565,7 +180,7 @@
                 allUsers = d.users || [];
                 renderUsers(allUsers);
                 loadStats();
-            } catch (e) {}
+            } catch (e) { console.error(e); showToast('❌ Error loading users', 'error'); }
         }
 
         function renderUsers(users) {
@@ -574,57 +189,37 @@
                 list.innerHTML = '<div class="empty">No users found</div>';
                 return;
             }
-            let html = `
-                <table>
-                    <tr>
-                        <th>Email</th>
-                        <th>Discord</th>
-                        <th>IP</th>
-                        <th>Role</th>
-                        <th>Plan</th>
-                        <th>Deploys</th>
-                        <th>Visits</th>
-                        <th>Blacklisted</th>
-                        <th>Action</th>
-                    </tr>
-            `;
+            let html = `<table><tr><th>Email</th><th>Discord</th><th>IP</th><th>Role</th><th>Plan</th><th>Deploys</th><th>Visits</th><th>Blacklisted</th><th>Action</th></tr>`;
             users.forEach(u => {
                 const ip = u.lastIp || '-';
                 const visits = u.totalVisits || 0;
                 const bl = u.blacklisted || false;
-                html += `
-                    <tr>
-                        <td>${u.email}</td>
-                        <td><strong>${u.discord || '-'}</strong></td>
-                        <td><span class="ip-badge">${ip}</span></td>
-                        <td><span class="role-badge ${u.role || 'user'}">${(u.role || 'user').toUpperCase()}</span></td>
-                        <td><span class="status-badge ${u.plan}">${u.plan.toUpperCase()}</span></td>
-                        <td>${u.dailyDeploys || 0}</td>
-                        <td>${visits}</td>
-                        <td class="${bl ? 'blacklisted-true' : 'blacklisted-false'}">${bl ? '⚠️ YES' : '✅ NO'}</td>
-                        <td>
-                            <div class="action-cell">
-                                <select class="plan-select" id="plan-${u.id}">
-                                    <option value="free" ${u.plan === 'free' ? 'selected' : ''}>Free</option>
-                                    <option value="pro" ${u.plan === 'pro' ? 'selected' : ''}>Pro</option>
-                                    <option value="elite" ${u.plan === 'elite' ? 'selected' : ''}>Elite</option>
-                                    <option value="lifetime" ${u.plan === 'lifetime' ? 'selected' : ''}>Lifetime</option>
-                                </select>
-                                <select class="role-select" id="role-${u.id}">
-                                    <option value="user" ${(u.role || 'user') === 'user' ? 'selected' : ''}>User</option>
-                                    <option value="mod" ${u.role === 'mod' ? 'selected' : ''}>Mod</option>
-                                    <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
-                                </select>
-                                <button class="btn-save" onclick="updateUser('${u.id}')">Save</button>
-                                ${bl ?
-                                    `<button class="btn-unblacklist" onclick="confirmUnblacklist('${u.id}')">Unblacklist</button>` :
-                                    `<button class="btn-blacklist" onclick="confirmBlacklist('${u.id}')">Blacklist</button>`
-                                }
-                                <button class="btn-delete" onclick="confirmDelete('${u.id}')">Delete</button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
+                html += `<tr>
+                    <td>${u.email}</td>
+                    <td><strong>${u.discord || '-'}</strong></td>
+                    <td><span class="ip-badge">${ip}</span></td>
+                    <td><span class="role-badge ${u.role || 'user'}">${(u.role || 'user').toUpperCase()}</span></td>
+                    <td><span class="status-badge ${u.plan}">${u.plan.toUpperCase()}</span></td>
+                    <td>${u.dailyDeploys || 0}</td>
+                    <td>${visits}</td>
+                    <td class="${bl ? 'blacklisted-true' : 'blacklisted-false'}">${bl ? '⚠️ YES' : '✅ NO'}</td>
+                    <td><div class="action-cell">
+                        <select class="plan-select" id="plan-${u.id}">
+                            <option value="free" ${u.plan === 'free' ? 'selected' : ''}>Free</option>
+                            <option value="pro" ${u.plan === 'pro' ? 'selected' : ''}>Pro</option>
+                            <option value="elite" ${u.plan === 'elite' ? 'selected' : ''}>Elite</option>
+                            <option value="lifetime" ${u.plan === 'lifetime' ? 'selected' : ''}>Lifetime</option>
+                        </select>
+                        <select class="role-select" id="role-${u.id}">
+                            <option value="user" ${(u.role || 'user') === 'user' ? 'selected' : ''}>User</option>
+                            <option value="mod" ${u.role === 'mod' ? 'selected' : ''}>Mod</option>
+                            <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
+                        </select>
+                        <button class="btn-save" onclick="updateUser('${u.id}')">Save</button>
+                        ${bl ? `<button class="btn-unblacklist" onclick="confirmUnblacklist('${u.id}')">Unblacklist</button>` : `<button class="btn-blacklist" onclick="confirmBlacklist('${u.id}')">Blacklist</button>`}
+                        <button class="btn-delete" onclick="confirmDelete('${u.id}')">Delete</button>
+                    </div></td>
+                </tr>`;
             });
             html += '</table>';
             list.innerHTML = html;
@@ -657,7 +252,7 @@
                     showToast('❌ Role update failed: ' + d.error, 'error'); return; }
                 showToast('✅ User updated successfully!', 'success');
                 loadUsers();
-            } catch (e) { showToast('❌ Network error', 'error'); }
+            } catch (e) { showToast('❌ Network error: ' + e.message, 'error'); }
         };
 
         window.confirmDelete = (userId) => {
@@ -673,7 +268,7 @@
                 if (res.ok) { showToast('✅ User deleted', 'success');
                     loadUsers(); } else { const d = await res.json();
                     showToast('❌ ' + d.error, 'error'); }
-            } catch (e) { showToast('❌ Network error', 'error'); }
+            } catch (e) { showToast('❌ Network error: ' + e.message, 'error'); }
         }
 
         window.confirmBlacklist = (userId) => {
@@ -683,7 +278,10 @@
         async function blacklistUser(userId) {
             try {
                 const u = allUsers.find(x => x.id === userId);
-                if (!u) return;
+                if (!u || !u.lastIp || u.lastIp === '-' || u.lastIp === 'unknown') {
+                    showToast('❌ No valid IP address found for this user', 'error');
+                    return;
+                }
                 const res = await fetch(API_URL + '/api/admin/blacklist', {
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
@@ -692,7 +290,7 @@
                 if (res.ok) { showToast('✅ User blacklisted successfully!', 'success');
                     loadUsers(); } else { const d = await res.json();
                     showToast('❌ ' + d.error, 'error'); }
-            } catch (e) { showToast('❌ Network error', 'error'); }
+            } catch (e) { showToast('❌ Network error: ' + e.message, 'error'); }
         }
 
         window.confirmUnblacklist = (userId) => {
@@ -708,7 +306,7 @@
                 if (res.ok) { showToast('✅ User unblacklisted successfully!', 'success');
                     loadUsers(); } else { const d = await res.json();
                     showToast('❌ ' + d.error, 'error'); }
-            } catch (e) { showToast('❌ Network error', 'error'); }
+            } catch (e) { showToast('❌ Network error: ' + e.message, 'error'); }
         }
 
         function logout() {
