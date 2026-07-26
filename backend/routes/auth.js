@@ -4,9 +4,11 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const router = express.Router();
 
-function getIp(req) {
-  return req.headers['x-forwarded-for']?.split(',')[0] || 
+function getClientIp(req) {
+  return req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 
          req.headers['cf-connecting-ip'] ||
+         req.headers['x-real-ip'] ||
+         req.socket?.remoteAddress ||
          req.ip ||
          'unknown';
 }
