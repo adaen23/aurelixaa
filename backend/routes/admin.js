@@ -165,7 +165,7 @@ router.post('/blacklist', async (req, res) => {
     }
     
     const { ip } = req.body;
-    if (!ip || ip === 'unknown' || ip === '-') {
+    if (!ip || ip === 'unknown' || ip === '-' || ip === '') {
       return res.status(400).json({ error: 'Invalid IP address' });
     }
     
@@ -174,14 +174,16 @@ router.post('/blacklist', async (req, res) => {
       return res.status(404).json({ error: 'No users found with this IP' });
     }
     
+    let count = 0;
     for (const user of users) {
       user.blacklisted = true;
       await user.save();
+      count++;
     }
     
     res.json({ 
       success: true, 
-      message: `Blacklisted ${users.length} users with IP ${ip}` 
+      message: `Blacklisted ${count} users with IP ${ip}` 
     });
   } catch (error) {
     console.error('Error blacklisting:', error);
