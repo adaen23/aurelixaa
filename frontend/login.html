@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - AURELIXA</title>
+    <title>Admin Login - AURELIXA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{background:#0a0a0f;min-height:100vh;display:flex;justify-content:center;align-items:center;font-family:'Inter',sans-serif;padding:20px;position:relative}
@@ -29,33 +28,45 @@
         .btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(124,58,237,0.25)}
         .error{color:#e74c5e;text-align:center;margin-top:10px;font-size:0.8rem}
         .footer{color:#444466;text-align:center;font-size:0.75rem;margin-top:20px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.03)}
-        .footer a{color:#a78bfa;text-decoration:none;transition:color 0.3s}
+        .footer a{color:#a78bfa;text-decoration:none}
         .footer a:hover{color:#c4b5fd}
-        .remember-me{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-        .remember-me label{color:#666688;font-size:0.8rem;cursor:pointer;display:flex;align-items:center;gap:8px}
-        .remember-me input[type="checkbox"]{accent-color:#7c3aed;width:15px;height:15px;cursor:pointer;margin:0}
     </style>
 </head>
 <body>
     <div class="container">
-        <a href="index.html" class="back">← Back</a>
-        <div class="logo">AURELIXA</div>
-        <div class="sub">Login to your account</div>
-        <div class="input-group"><label>Email</label><input type="email" id="loginEmail" placeholder="your@email.com"></div>
-        <div class="input-group"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
-        <div class="remember-me"><label><input type="checkbox" id="rememberMe"> Remember me</label></div>
-        <button class="btn" onclick="login()">Login</button>
-        <div id="loginError" class="error"></div>
-        <div class="footer">Don't have an account? <a href="register.html">Sign up</a></div>
+        <a href="dashboard.html" class="back">← Back to Dashboard</a>
+        <div class="logo">⚙️ Admin</div>
+        <div class="sub">Enter admin credentials</div>
+        <div class="input-group"><label>Username</label><input type="text" id="username" placeholder="admin"></div>
+        <div class="input-group"><label>Password</label><input type="password" id="password" placeholder="••••••••"></div>
+        <button class="btn" onclick="adminLogin()">Login</button>
+        <div id="error" class="error"></div>
     </div>
     <script>
-        const API_URL='https://api.aurelixa.online';
-        if(localStorage.getItem('rememberMe')==='true')document.getElementById('rememberMe').checked=true;
-        async function login(){
-            const e=document.getElementById('loginEmail').value,p=document.getElementById('loginPassword').value,r=document.getElementById('rememberMe').checked,err=document.getElementById('loginError');err.textContent='';
-            try{const res=await fetch(API_URL+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e,password:p})}),data=await res.json();if(!res.ok){err.textContent='❌ '+(data.error||'Login failed');return}localStorage.setItem('token',data.token);localStorage.setItem('userEmail',data.user.email);r?localStorage.setItem('rememberMe','true'):localStorage.removeItem('rememberMe');window.location.href='dashboard.html'}catch(e){err.textContent='❌ Network error'}
+        const API_URL = 'https://api.aurelixa.online';
+        async function adminLogin() {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+            const e = document.getElementById('error');
+            e.textContent = '';
+            try {
+                const r = await fetch(API_URL + '/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                const d = await r.json();
+                if (!r.ok) {
+                    e.textContent = '❌ ' + (d.error || 'Invalid credentials');
+                    return;
+                }
+                localStorage.setItem('adminToken', d.token);
+                window.location.href = 'admin.html';
+            } catch (err) {
+                e.textContent = '❌ Network error';
+            }
         }
-        document.addEventListener('keydown',e=>{if(e.key==='Enter')login()});
+        document.addEventListener('keydown', e => { if (e.key === 'Enter') adminLogin(); });
     </script>
 </body>
 </html>
