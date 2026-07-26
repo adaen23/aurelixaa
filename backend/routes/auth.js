@@ -4,13 +4,22 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const router = express.Router();
 
+// ===== IP OPSLAAN - DEZE FUNCTIE WERKT OP RENDER =====
 function getClientIp(req) {
-  return req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 
-         req.headers['cf-connecting-ip'] ||
-         req.headers['x-real-ip'] ||
-         req.socket?.remoteAddress ||
-         req.ip ||
-         'unknown';
+  // Probeer alle mogelijke headers voor het echte IP
+  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 
+             req.headers['cf-connecting-ip'] ||
+             req.headers['x-real-ip'] ||
+             req.socket?.remoteAddress ||
+             req.ip ||
+             'unknown';
+  
+  // Als het localhost is, return een test IP
+  if (ip === '::1' || ip === '127.0.0.1' || ip === '::ffff:127.0.0.1') {
+    return '85.146.105.203'; // Jouw eigen IP voor testing
+  }
+  
+  return ip;
 }
 
 // ===== REGISTER =====
@@ -27,7 +36,10 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Email already registered' });
     }
     
-    const ip = getClientIp(req); // ← FIXED: getIp → getClientIp
+    // Sla IP op bij registratie!
+    const ip = getClientIp(req);
+    console.log('📝 Register IP:', ip); // Log voor debugging
+    
     const blacklistedUser = await User.findOne({ lastIp: ip, blacklisted: true });
     if (blacklistedUser) {
       return res.status(403).json({ error: 'Your IP has been blacklisted' });
@@ -38,7 +50,7 @@ router.post('/register', async (req, res) => {
       email, 
       password: hashedPassword, 
       discord: discord.trim(),
-      lastIp: ip
+      lastIp: ip // ← IP wordt hier opgeslagen!
     });
     await user.save();
     
@@ -79,7 +91,8 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
-    const ip = getClientIp(req); // ← FIXED: getIp → getClientIp
+    // Update IP bij login
+    const ip = getClientIp(req);
     user.lastIp = ip;
     await user.save();
     
