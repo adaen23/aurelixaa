@@ -6,17 +6,22 @@
     <title>Register - AURELIXA</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#f0f8ff;min-height:100vh;display:flex;justify-content:center;align-items:center;font-family:'Segoe UI',sans-serif;padding:20px}
-        .container{max-width:400px;width:100%;background:white;border-radius:20px;padding:40px;box-shadow:0 20px 60px rgba(0,0,0,0.08)}
-        h1{font-size:2rem;color:#1a5a8c;margin-bottom:5px;text-align:center}
-        .sub{color:#6a8aaa;text-align:center;margin-bottom:30px}
-        input{width:100%;padding:14px;border:2px solid #d8e8f0;border-radius:10px;margin-bottom:15px;font-size:1rem;transition:0.3s}
-        input:focus{outline:none;border-color:#4a90d9}
-        .btn{width:100%;padding:16px;background:#4a90d9;color:white;border:none;border-radius:10px;font-size:1.1rem;font-weight:600;cursor:pointer;transition:0.3s}
-        .btn:hover{background:#3a7ac4}
+        body{background:#0a0e1a;min-height:100vh;display:flex;justify-content:center;align-items:center;font-family:'Segoe UI',sans-serif;padding:20px}
+        .container{max-width:420px;width:100%;background:#111b2e;border:1px solid #1a2a4a;border-radius:20px;padding:40px;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+        h1{font-size:2.5rem;color:#4a9eff;text-align:center;text-shadow:0 0 30px rgba(74,158,255,0.15)}
+        .sub{color:#6a8aaa;text-align:center;margin-bottom:30px;font-size:0.95rem}
+        .input-group{position:relative;margin-bottom:15px}
+        .input-group label{color:#6a8aaa;font-size:0.8rem;display:block;margin-bottom:5px}
+        .input-group input{width:100%;padding:14px;background:#0a0e1a;border:1px solid #1a2a4a;border-radius:10px;color:#c8d6e5;font-size:1rem;transition:0.3s}
+        .input-group input:focus{outline:none;border-color:#4a9eff;box-shadow:0 0 20px rgba(74,158,255,0.1)}
+        .input-group .required{color:#ff4757;font-size:0.7rem;margin-left:5px}
+        .btn{width:100%;padding:16px;background:#4a9eff;color:#0a0e1a;border:none;border-radius:10px;font-size:1.1rem;font-weight:700;cursor:pointer;transition:0.3s}
+        .btn:hover{background:#6ab0ff;transform:scale(1.02)}
         .link{color:#6a8aaa;text-align:center;margin-top:20px;display:block;font-size:0.9rem}
-        .link a{color:#4a90d9;text-decoration:none}
-        .error{color:#e74c3c;text-align:center;margin-top:10px;font-size:0.9rem}
+        .link a{color:#4a9eff;text-decoration:none}
+        .link a:hover{text-decoration:underline}
+        .error{color:#ff4757;text-align:center;margin-top:10px;font-size:0.9rem}
+        .success{color:#4eff6a;text-align:center;margin-top:10px;font-size:0.9rem}
     </style>
 </head>
 <body>
@@ -24,14 +29,24 @@
         <h1>AURELIXA</h1>
         <div class="sub">Create your account</div>
         <form id="registerForm">
-            <input type="email" id="email" placeholder="Email" required>
-            <input type="text" id="discord" placeholder="Discord Username (optional)">
-            <input type="password" id="password" placeholder="Password (min 6 chars)" required minlength="6">
-            <button type="submit" class="btn">Register</button>
+            <div class="input-group">
+                <label>Email <span class="required">*</span></label>
+                <input type="email" id="email" placeholder="your@email.com" required>
+            </div>
+            <div class="input-group">
+                <label>Discord Username <span class="required">*</span></label>
+                <input type="text" id="discord" placeholder="@username" required>
+            </div>
+            <div class="input-group">
+                <label>Password <span class="required">*</span></label>
+                <input type="password" id="password" placeholder="Min 6 characters" required minlength="6">
+            </div>
+            <button type="submit" class="btn">🚀 Create Account</button>
         </form>
         <div id="error" class="error"></div>
+        <div id="success" class="success"></div>
         <div class="link">Already have an account? <a href="login.html">Login</a></div>
-        <div class="link" style="margin-top:10px;font-size:0.8rem;color:#8aabba">Need support? Contact @briefjes on Discord</div>
+        <div class="link" style="margin-top:10px;font-size:0.8rem;color:#4a5a6a">Need support? Contact @briefjes on Discord</div>
     </div>
     <script>
         const API_URL = 'https://api.aurelixa.online';
@@ -40,6 +55,15 @@
             const email = document.getElementById('email').value;
             const discord = document.getElementById('discord').value;
             const password = document.getElementById('password').value;
+            
+            document.getElementById('error').textContent = '';
+            document.getElementById('success').textContent = '';
+            
+            if (!discord.trim()) {
+                document.getElementById('error').textContent = '❌ Discord username is required';
+                return;
+            }
+            
             try {
                 const res = await fetch(API_URL + '/api/auth/register', {
                     method: 'POST',
@@ -48,13 +72,14 @@
                 });
                 const data = await res.json();
                 if (!res.ok) {
-                    document.getElementById('error').textContent = data.error || 'Registration failed';
+                    document.getElementById('error').textContent = '❌ ' + (data.error || 'Registration failed');
                     return;
                 }
                 localStorage.setItem('token', data.token);
-                window.location.href = 'dashboard.html';
+                document.getElementById('success').textContent = '✅ Registration successful! Redirecting...';
+                setTimeout(() => window.location.href = 'dashboard.html', 1500);
             } catch (e) {
-                document.getElementById('error').textContent = 'Network error';
+                document.getElementById('error').textContent = '❌ Network error';
             }
         });
     </script>
