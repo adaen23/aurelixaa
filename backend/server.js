@@ -3,25 +3,41 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const cron = require('node-cron');
+const path = require('path');
 const Deployment = require('./models/Deployment');
 
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+// ===== CORS =====
+app.use(cors({
+  origin: '*',
+  credentials: true
+}));
+
 app.use(express.json());
+
+// ===== SERVE STATIC FILES (HTML, CSS, JS) =====
+// Zorg dat de frontend bestanden in de 'public' map staan
+app.use(express.static(path.join(__dirname, '../public')));
 
 // ===== SERVE DEPLOYED PAGES =====
 app.get('/:subdomain', async (req, res) => {
   try {
     const { subdomain } = req.params;
     const deployment = await Deployment.findOne({ subdomain, active: true });
-    if (!deployment) return res.status(404).send('Page not found');
+    
+    if (!deployment) {
+      return res.status(404).send('Page not found');
+    }
+    
     if (new Date() > deployment.expiresAt) {
       deployment.active = false;
       await deployment.save();
       return res.status(404).send('Page expired');
     }
+    
     res.send(deployment.pageHTML);
   } catch (error) {
     console.error(error);
@@ -32,12 +48,12 @@ app.get('/:subdomain', async (req, res) => {
 // ===== ROUTES =====
 const authRoutes = require('./routes/auth');
 const deployRoutes = require('./routes/deploy');
-const adminRoutes = require('./routes/admin');   // <-- Zorg dat dit er is!
+const adminRoutes = require('./routes/admin');
 const webhookRoutes = require('./routes/webhook');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/deploy', deployRoutes);
-app.use('/api/admin', adminRoutes);              // <-- Zorg dat dit er is!
+app.use('/api/admin', adminRoutes);
 app.use('/api/webhook', webhookRoutes);
 
 // ===== AUTO-DELETE EXPIRED =====
