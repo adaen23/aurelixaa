@@ -174,13 +174,10 @@
 
         async function loadUsers() {
             try {
-                console.log('📡 Fetching users with token:', token);
                 const r = await fetch(API_URL + '/api/admin/users', {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
-                console.log('📡 Response status:', r.status);
                 const d = await r.json();
-                console.log('📡 Response data:', d);
                 allUsers = d.users || [];
                 renderUsers(allUsers);
                 loadStats();
@@ -321,7 +318,7 @@
                 }
                 
                 if (!u.lastIp || u.lastIp === '-' || u.lastIp === 'unknown' || u.lastIp === '') {
-                    showToast('❌ This user has no IP address stored. Ask them to login first.', 'error');
+                    showToast('❌ No IP address found. User must login first.', 'error');
                     return;
                 }
                 
