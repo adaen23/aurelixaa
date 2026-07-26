@@ -1,20 +1,31 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Deployment = require('../models/Deployment');
 const router = express.Router();
 
-// Test route - geen beveiliging
+// ===== ADMIN LOGIN =====
 router.post('/login', (req, res) => {
-  const { username, password } = req.body;
-  if (username === 'admin' && password === 'aurelixa_admin_2024') {
-    return res.json({ token: 'test-token-123' });
+  try {
+    const { username, password } = req.body;
+    if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
+      const token = jwt.sign({ admin: true }, process.env.JWT_SECRET, { expiresIn: '24h' });
+      return res.json({ token });
+    }
+    res.status(401).json({ error: 'Invalid credentials' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-  res.status(401).json({ error: 'Invalid credentials' });
 });
 
-// Test - users zonder token check
+// ===== GET ALL USERS =====
 router.get('/users', async (req, res) => {
   try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
+    
     const users = await User.find({}).select('-password');
     res.json({ users });
   } catch (err) {
@@ -22,11 +33,17 @@ router.get('/users', async (req, res) => {
   }
 });
 
-// Test - update plan zonder token
+// ===== UPDATE PLAN =====
 router.put('/user/:userId/plan', async (req, res) => {
   try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
+    
     const user = await User.findById(req.params.userId);
     if (!user) return res.status(404).json({ error: 'User not found' });
+    
     user.plan = req.body.plan;
     await user.save();
     res.json({ success: true, plan: user.plan });
@@ -35,11 +52,17 @@ router.put('/user/:userId/plan', async (req, res) => {
   }
 });
 
-// Test - update role zonder token
+// ===== UPDATE ROLE =====
 router.put('/user/:userId/role', async (req, res) => {
   try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
+    
     const user = await User.findById(req.params.userId);
     if (!user) return res.status(404).json({ error: 'User not found' });
+    
     user.role = req.body.role;
     await user.save();
     res.json({ success: true, role: user.role });
@@ -48,9 +71,14 @@ router.put('/user/:userId/role', async (req, res) => {
   }
 });
 
-// Test - delete zonder token
+// ===== DELETE USER =====
 router.delete('/user/:userId', async (req, res) => {
   try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
+    
     const user = await User.findByIdAndDelete(req.params.userId);
     if (!user) return res.status(404).json({ error: 'User not found' });
     await Deployment.deleteMany({ userId: req.params.userId });
@@ -60,27 +88,43 @@ router.delete('/user/:userId', async (req, res) => {
   }
 });
 
-// Test - blacklist zonder token
+// ===== BLACKLIST =====
 router.post('/blacklist', async (req, res) => {
   try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
+    
     const { ip } = req.body;
-    if (!ip) return res.status(400).json({ error: 'IP required' });
-    const users = await User.find({ lastIp: ip });
-    for (const u of users) {
-      u.blacklisted = true;
-      await u.save();
+    if (!ip || ip === 'unknown' || ip === '-') {
+      return res.status(400).json({ error: 'Invalid IP address' });
     }
-    res.json({ success: true, count: users.length });
+    
+    const users = await User.find({ lastIp: ip });
+    let count = 0;
+    for (const user of users) {
+      user.blacklisted = true;
+      await user.save();
+      count++;
+    }
+    res.json({ success: true, count });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Test - unblacklist zonder token
+// ===== UNBLACKLIST =====
 router.delete('/blacklist/:userId', async (req, res) => {
   try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
+    
     const user = await User.findById(req.params.userId);
     if (!user) return res.status(404).json({ error: 'User not found' });
+    
     user.blacklisted = false;
     await user.save();
     res.json({ success: true });
@@ -89,14 +133,25 @@ router.delete('/blacklist/:userId', async (req, res) => {
   }
 });
 
-// Test - stats zonder token
+// ===== STATS =====
 router.get('/stats', async (req, res) => {
   try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded.admin) return res.status(403).json({ error: 'Admin only' });
+    
     const totalUsers = await User.countDocuments();
     const totalDeployments = await Deployment.countDocuments();
     const activeDeployments = await Deployment.countDocuments({ active: true });
     const totalVisits = await Deployment.aggregate([{ $group: { _id: null, total: { $sum: '$visits' } } }]);
-    res.json({ totalUsers, totalDeployments, activeDeployments, totalVisits: totalVisits[0]?.total || 0 });
+    
+    res.json({ 
+      totalUsers, 
+      totalDeployments, 
+      activeDeployments, 
+      totalVisits: totalVisits[0]?.total || 0 
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
