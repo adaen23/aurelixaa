@@ -4,6 +4,14 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const router = express.Router();
 
+function getClientIp(req) {
+  return req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 
+         req.headers['cf-connecting-ip'] ||
+         req.headers['x-real-ip'] ||
+         req.ip ||
+         'unknown';
+}
+
 // ===== REGISTER =====
 router.post('/register', async (req, res) => {
   try {
@@ -18,8 +26,7 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Email already registered' });
     }
     
-    // Check if IP is blacklisted
-    const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+    const ip = getClientIp(req);
     const blacklistedUser = await User.findOne({ lastIp: ip, blacklisted: true });
     if (blacklistedUser) {
       return res.status(403).json({ error: 'Your IP has been blacklisted' });
@@ -48,7 +55,7 @@ router.post('/register', async (req, res) => {
     });
   } catch (error) {
     console.error('Register error:', error);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
 
@@ -62,7 +69,6 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
-    // Check if user is blacklisted
     if (user.blacklisted) {
       return res.status(403).json({ error: 'Your account has been blacklisted' });
     }
@@ -72,7 +78,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
-    const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+    const ip = getClientIp(req);
     user.lastIp = ip;
     await user.save();
     
@@ -91,7 +97,7 @@ router.post('/login', async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
 
@@ -99,11 +105,15 @@ router.post('/login', async (req, res) => {
 router.get('/me', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
     
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.userId);
-    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
     
     if (user.blacklisted) {
       return res.status(403).json({ error: 'Your account has been blacklisted' });
@@ -121,6 +131,7 @@ router.get('/me', async (req, res) => {
       } 
     });
   } catch (error) {
+    console.error('Get user error:', error);
     res.status(401).json({ error: 'Invalid token' });
   }
 });
@@ -129,7 +140,9 @@ router.get('/me', async (req, res) => {
 router.post('/webhook', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
     
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { webhook } = req.body;
@@ -141,7 +154,8 @@ router.post('/webhook', async (req, res) => {
     await User.findByIdAndUpdate(decoded.userId, { webhook });
     res.json({ success: true, message: 'Webhook updated' });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Webhook update error:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
 
