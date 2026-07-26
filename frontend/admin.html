@@ -115,8 +115,6 @@
 
     <script>
         const API_URL = 'https://api.aurelixa.online';
-        const token = localStorage.getItem('adminToken');
-        if (!token) window.location.href = 'admin-login.html';
 
         let allUsers = [];
         let pendingAction = null;
@@ -159,9 +157,7 @@
 
         async function loadStats() {
             try {
-                const r = await fetch(API_URL + '/api/admin/stats', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
+                const r = await fetch(API_URL + '/api/admin/stats');
                 const d = await r.json();
                 document.getElementById('totalUsers').textContent = d.totalUsers || 0;
                 document.getElementById('totalDeployments').textContent = d.totalDeployments || 0;
@@ -172,11 +168,8 @@
 
         async function loadUsers() {
             try {
-                const r = await fetch(API_URL + '/api/admin/users', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
+                const r = await fetch(API_URL + '/api/admin/users');
                 const d = await r.json();
-                console.log('Users from API:', d);
                 allUsers = d.users || [];
                 renderUsers(allUsers);
                 loadStats();
@@ -188,7 +181,6 @@
 
         function renderUsers(users) {
             const list = document.getElementById('usersList');
-            console.log('Rendering users:', users);
             
             if (!users || users.length === 0) {
                 list.innerHTML = '<div class="empty">No users found</div>';
@@ -247,10 +239,7 @@
             try {
                 let res = await fetch(API_URL + '/api/admin/user/' + userId + '/plan', {
                     method: 'PUT',
-                    headers: { 
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type': 'application/json' 
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ plan })
                 });
                 
@@ -262,10 +251,7 @@
                 
                 res = await fetch(API_URL + '/api/admin/user/' + userId + '/role', {
                     method: 'PUT',
-                    headers: { 
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type': 'application/json' 
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ role })
                 });
                 
@@ -289,8 +275,7 @@
         async function deleteUser(userId) {
             try {
                 const res = await fetch(API_URL + '/api/admin/user/' + userId, { 
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + token }
+                    method: 'DELETE'
                 });
                 
                 if (res.ok) { 
@@ -319,10 +304,7 @@
                 
                 const res = await fetch(API_URL + '/api/admin/blacklist', {
                     method: 'POST',
-                    headers: { 
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type': 'application/json' 
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ip: u.lastIp })
                 });
                 
@@ -345,8 +327,7 @@
         async function unblacklistUser(userId) {
             try {
                 const res = await fetch(API_URL + '/api/admin/blacklist/' + userId, { 
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + token }
+                    method: 'DELETE'
                 });
                 
                 if (res.ok) { 
