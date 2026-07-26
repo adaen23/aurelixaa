@@ -14,9 +14,11 @@ function getClientIp(req) {
              req.ip ||
              'unknown';
   
+  console.log('🔍 IP detected:', ip);
+  
   // Als het localhost is, return een test IP
   if (ip === '::1' || ip === '127.0.0.1' || ip === '::ffff:127.0.0.1') {
-    return '85.146.105.203'; // Jouw eigen IP voor testing
+    return '85.146.105.203';
   }
   
   return ip;
@@ -26,6 +28,7 @@ function getClientIp(req) {
 router.post('/register', async (req, res) => {
   try {
     const { email, password, discord } = req.body;
+    console.log('📝 Register attempt:', email);
     
     if (!discord || discord.trim() === '') {
       return res.status(400).json({ error: 'Discord username is required' });
@@ -38,7 +41,7 @@ router.post('/register', async (req, res) => {
     
     // Sla IP op bij registratie!
     const ip = getClientIp(req);
-    console.log('📝 Register IP:', ip); // Log voor debugging
+    console.log('📝 Register IP:', ip);
     
     const blacklistedUser = await User.findOne({ lastIp: ip, blacklisted: true });
     if (blacklistedUser) {
@@ -50,9 +53,10 @@ router.post('/register', async (req, res) => {
       email, 
       password: hashedPassword, 
       discord: discord.trim(),
-      lastIp: ip // ← IP wordt hier opgeslagen!
+      lastIp: ip
     });
     await user.save();
+    console.log('✅ User created with IP:', ip);
     
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
     res.json({ 
@@ -67,7 +71,7 @@ router.post('/register', async (req, res) => {
       } 
     });
   } catch (error) {
-    console.error('Register error:', error);
+    console.error('❌ Register error:', error);
     res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
@@ -76,6 +80,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log('🔑 Login attempt:', email);
     
     const user = await User.findOne({ email });
     if (!user) {
@@ -95,6 +100,7 @@ router.post('/login', async (req, res) => {
     const ip = getClientIp(req);
     user.lastIp = ip;
     await user.save();
+    console.log('✅ Login IP updated:', ip);
     
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
     res.json({ 
@@ -110,7 +116,7 @@ router.post('/login', async (req, res) => {
       } 
     });
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('❌ Login error:', error);
     res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
@@ -145,7 +151,7 @@ router.get('/me', async (req, res) => {
       } 
     });
   } catch (error) {
-    console.error('Get user error:', error);
+    console.error('❌ Get user error:', error);
     res.status(401).json({ error: 'Invalid token' });
   }
 });
@@ -168,7 +174,7 @@ router.post('/webhook', async (req, res) => {
     await User.findByIdAndUpdate(decoded.userId, { webhook });
     res.json({ success: true, message: 'Webhook updated' });
   } catch (error) {
-    console.error('Webhook update error:', error);
+    console.error('❌ Webhook update error:', error);
     res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
