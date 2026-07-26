@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  plan: { type: String, default: 'free' }, // free, pro, elite, lifetime
-  role: { type: String, default: 'user' }, // user, mod, admin
+  plan: { type: String, default: 'free' },
+  role: { type: String, default: 'user' },
   dailyDeploys: { type: Number, default: 0 },
   lastDeployDate: { type: String, default: '' },
   webhook: { type: String, default: '' },
