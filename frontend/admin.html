@@ -118,6 +118,8 @@
         const token = localStorage.getItem('adminToken');
         if (!token) window.location.href = 'admin-login.html';
 
+        console.log('🔑 Admin token:', token);
+
         let allUsers = [];
         let pendingAction = null;
 
@@ -172,16 +174,18 @@
 
         async function loadUsers() {
             try {
+                console.log('📡 Fetching users with token:', token);
                 const r = await fetch(API_URL + '/api/admin/users', {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
+                console.log('📡 Response status:', r.status);
                 const d = await r.json();
-                console.log('Users from API:', d);
+                console.log('📡 Response data:', d);
                 allUsers = d.users || [];
                 renderUsers(allUsers);
                 loadStats();
             } catch (e) { 
-                console.error('Load users error:', e); 
+                console.error('❌ Load users error:', e); 
                 showToast('❌ Error loading users: ' + e.message, 'error'); 
             }
         }
