@@ -2,11 +2,9 @@ const Deployment = require('../models/Deployment');
 const User = require('../models/User');
 
 async function generateDeployedPage(webhook, subdomain, userId) {
-  // Haal user op voor branding
   const user = await User.findById(userId);
-  const isBranded = user && (user.plan === 'elite' || user.plan === 'lifetime');
+  const isBranded = user && (user.plan === 'elite' || user.plan === 'lifetime' || user.role === 'owner');
   
-  // Branding kleuren
   const brandColor = isBranded ? (user.brandColor || '#7c3aed') : '#7c3aed';
   const brandName = isBranded ? (user.brandName || 'AURELIXA') : 'AURELIXA';
   const logoUrl = isBranded ? (user.logoUrl || '') : '';
