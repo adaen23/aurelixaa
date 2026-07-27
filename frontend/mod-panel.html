@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mod Panel - AURELIXA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:#0a0a0f;color:#e8e8e8;font-family:'Inter',sans-serif;padding:24px;min-height:100vh}
+        .container{max-width:1000px;margin:0 auto;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:24px;padding:28px 32px}
+        .header{display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.04);margin-bottom:24px;flex-wrap:wrap;gap:12px}
+        .header h1{font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,#7c3aed 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .header a{color:#666688;text-decoration:none;font-size:0.85rem;transition:color 0.3s}
+        .header a:hover{color:#a78bfa}
+        .header .btn-logout{background:transparent;color:#666688;border:1px solid rgba(255,255,255,0.06);padding:6px 18px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.8rem;transition:all 0.3s}
+        .header .btn-logout:hover{background:rgba(255,255,255,0.03);color:#a78bfa}
+        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:24px}
+        .stat-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:12px;padding:16px 14px;text-align:center}
+        .stat-card .number{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#7c3aed 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .stat-card .label{color:#666688;font-size:0.7rem;font-weight:600;text-transform:uppercase;margin-top:4px}
+        .users-table{overflow-x:auto}
+        table{width:100%;border-collapse:collapse;font-size:0.8rem}
+        th{text-align:left;padding:10px 8px;color:#a78bfa;border-bottom:1px solid rgba(255,255,255,0.06);font-weight:600}
+        td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,0.03);color:#c8c8e8;vertical-align:middle}
+        .ip-badge{background:rgba(255,255,255,0.04);padding:2px 12px;border-radius:20px;font-size:0.65rem;font-family:monospace;color:#8888aa;border:1px solid rgba(255,255,255,0.04)}
+        .role-badge{padding:2px 12px;border-radius:20px;font-size:0.6rem;font-weight:600;text-transform:uppercase;display:inline-block}
+        .role-badge.user{background:rgba(255,255,255,0.04);color:#666688;border:1px solid rgba(255,255,255,0.04)}
+        .role-badge.mod{background:rgba(52,152,219,0.2);color:#5dade2;border:1px solid rgba(52,152,219,0.3)}
+        .role-badge.admin{background:rgba(241,196,15,0.2);color:#f1c40f;border:1px solid rgba(241,196,15,0.3)}
+        .status-badge{padding:2px 12px;border-radius:20px;font-size:0.6rem;font-weight:600;text-transform:uppercase;display:inline-block}
+        .status-badge.free{background:rgba(255,255,255,0.04);color:#666688;border:1px solid rgba(255,255,255,0.04)}
+        .status-badge.pro{background:rgba(124,58,237,0.15);color:#a78bfa;border:1px solid rgba(124,58,237,0.1)}
+        .status-badge.elite{background:rgba(124,58,237,0.15);color:#a78bfa;border:1px solid rgba(124,58,237,0.1)}
+        .status-badge.lifetime{background:rgba(241,196,15,0.1);color:#f1c40f;border:1px solid rgba(241,196,15,0.1)}
+        .search-box{width:100%;padding:10px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;color:#e8e8e8;font-size:0.9rem;font-family:inherit;margin-bottom:14px}
+        .search-box:focus{outline:none;border-color:rgba(124,58,237,0.2)}
+        .empty{color:#444466;text-align:center;padding:30px;font-size:0.9rem}
+        .action-cell{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+        .btn-save{background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);color:#fff;border:none;padding:4px 14px;border-radius:6px;cursor:pointer;font-size:0.7rem;font-weight:600;transition:all 0.3s}
+        .btn-save:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(124,58,237,0.25)}
+        .toast-container{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);z-index:1000;display:flex;flex-direction:column;align-items:center;gap:8px}
+        .toast{padding:14px 28px;border-radius:12px;font-weight:600;font-size:0.9rem;font-family:'Inter',sans-serif;backdrop-filter:blur(10px);animation:slideUp 0.4s ease;min-width:200px;text-align:center}
+        .toast.success{background:rgba(78,255,106,0.12);border:1px solid rgba(78,255,106,0.2);color:#4eff6a}
+        .toast.error{background:rgba(231,76,94,0.12);border:1px solid rgba(231,76,94,0.2);color:#e74c5e}
+        @keyframes slideUp{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ Mod Panel</h1>
+            <div>
+                <a href="dashboard.html">← Dashboard</a>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card"><div class="number" id="totalUsers">0</div><div class="label">Total Users</div></div>
+            <div class="stat-card"><div class="number" id="totalDeployments">0</div><div class="label">Total Deployments</div></div>
+            <div class="stat-card"><div class="number" id="activeDeployments">0</div><div class="label">Active Links</div></div>
+            <div class="stat-card"><div class="number" id="totalVisits">0</div><div class="label">Total Visits</div></div>
+        </div>
+
+        <div class="users-table">
+            <h2 style="color:#a78bfa;font-size:1rem;font-weight:700;margin-bottom:12px;">👥 Users</h2>
+            <input type="text" class="search-box" id="searchInput" placeholder="🔍 Search by email or Discord..." onkeyup="filterUsers()">
+            <div id="usersList"><div class="empty">Loading users...</div></div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        const API_URL = 'https://api.aurelixa.online';
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = 'login.html';
+
+        let allUsers = [];
+
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.textContent = msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        async function loadStats() {
+            try {
+                const r = await fetch(API_URL + '/api/admin/stats', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const d = await r.json();
+                document.getElementById('totalUsers').textContent = d.totalUsers || 0;
+                document.getElementById('totalDeployments').textContent = d.totalDeployments || 0;
+                document.getElementById('activeDeployments').textContent = d.activeDeployments || 0;
+                document.getElementById('totalVisits').textContent = d.totalVisits || 0;
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadUsers() {
+            try {
+                const r = await fetch(API_URL + '/api/admin/users', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const d = await r.json();
+                allUsers = d.users || [];
+                renderUsers(allUsers);
+                loadStats();
+            } catch (e) { 
+                showToast('❌ Error loading users', 'error'); 
+            }
+        }
+
+        function renderUsers(users) {
+            const list = document.getElementById('usersList');
+            if (!users || users.length === 0) {
+                list.innerHTML = '<div class="empty">No users found</div>';
+                return;
+            }
+            let html = `<table><tr><th>Email</th><th>Discord</th><th>IP</th><th>Role</th><th>Plan</th><th>Deploys</th><th>Visits</th></tr>`;
+            users.forEach(u => {
+                const ip = u.lastIp || '-';
+                const visits = u.totalVisits || 0;
+                html += `<tr>
+                    <td>${u.email}</td>
+                    <td><strong>${u.discord || '-'}</strong></td>
+                    <td><span class="ip-badge">${ip}</span></td>
+                    <td><span class="role-badge ${u.role || 'user'}">${(u.role || 'user').toUpperCase()}</span></td>
+                    <td><span class="status-badge ${u.plan}">${u.plan.toUpperCase()}</span></td>
+                    <td>${u.dailyDeploys || 0}</td>
+                    <td>${visits}</td>
+                </tr>`;
+            });
+            html += '</table>';
+            list.innerHTML = html;
+        }
+
+        function filterUsers() {
+            const s = document.getElementById('searchInput').value.toLowerCase();
+            const f = allUsers.filter(u => u.email.toLowerCase().includes(s) || (u.discord && u.discord.toLowerCase().includes(s)));
+            renderUsers(f);
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+
+        loadUsers();
+    </script>
+</body>
+</html>
