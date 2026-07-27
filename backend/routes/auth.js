@@ -4,10 +4,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const router = express.Router();
 
-// ===== HARCODED OWNER =====
-const OWNER_EMAIL = 'owner@aurelixa.com';
-const OWNER_PASSWORD = 'Owner2024!';
-
 function getClientIp(req) {
   return req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 
          req.headers['cf-connecting-ip'] ||
@@ -26,13 +22,11 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Discord username is required' });
     }
     
-    // Check if email is already registered
     const exists = await User.findOne({ email });
     if (exists) {
       return res.status(400).json({ error: 'Email already registered' });
     }
     
-    // Check blacklist
     const ip = getClientIp(req);
     const blacklisted = await User.findOne({ lastIp: ip, blacklisted: true });
     if (blacklisted) {
@@ -71,28 +65,6 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     console.log('🔑 Login attempt:', email);
     
-    // ===== CHECK OWNER FIRST =====
-    if (email === OWNER_EMAIL && password === OWNER_PASSWORD) {
-      console.log('✅ Owner logged in!');
-      const token = jwt.sign({ 
-        userId: 'owner', 
-        isOwner: true 
-      }, process.env.JWT_SECRET, { expiresIn: '24h' });
-      
-      return res.json({ 
-        token, 
-        user: { 
-          id: 'owner', 
-          email: OWNER_EMAIL, 
-          plan: 'lifetime', 
-          isOwner: true,
-          role: 'owner',
-          webhook: ''
-        } 
-      });
-    }
-    
-    // ===== CHECK NORMAL USER =====
     const user = await User.findOne({ email });
     if (!user) {
       console.log('❌ User not found:', email);
@@ -110,7 +82,6 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
-    // Update IP
     const ip = getClientIp(req);
     user.lastIp = ip;
     await user.save();
@@ -142,24 +113,6 @@ router.get('/me', async (req, res) => {
     }
     
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('🔍 Token decoded:', decoded);
-    
-    // ===== CHECK OWNER =====
-    if (decoded.isOwner || decoded.userId === 'owner') {
-      console.log('👑 Owner detected');
-      return res.json({ 
-        user: { 
-          id: 'owner', 
-          email: OWNER_EMAIL, 
-          plan: 'lifetime', 
-          isOwner: true,
-          role: 'owner',
-          webhook: ''
-        } 
-      });
-    }
-    
-    // ===== CHECK NORMAL USER =====
     const user = await User.findById(decoded.userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
