@@ -11,8 +11,6 @@ function isValidId(id) {
 }
 
 // --- Admin login ---
-// Geeft nu een echte JWT terug (i.p.v. hardcoded string 'admin-token-123'),
-// zodat de token hieronder ook daadwerkelijk geverifieerd kan worden.
 router.post('/login', (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
@@ -25,7 +23,7 @@ router.post('/login', (req, res) => {
   res.status(401).json({ error: 'Invalid credentials' });
 });
 
-// --- Auth middleware: beveiligt alles hieronder ---
+// --- Auth middleware ---
 function requireAdmin(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -84,7 +82,7 @@ router.put('/user/:userId/role', async (req, res) => {
     const { role } = req.body;
     if (!isValidId(userId)) return res.status(400).json({ error: 'Invalid user id' });
 
-    const allowedRoles = ['user', 'admin'];
+    const allowedRoles = ['user', 'mod', 'admin'];
     if (!allowedRoles.includes(role)) {
       return res.status(400).json({ error: `Invalid role. Allowed: ${allowedRoles.join(', ')}` });
     }
@@ -118,10 +116,35 @@ router.delete('/user/:userId', async (req, res) => {
 router.post('/blacklist', async (req, res) => {
   try {
     const { ip } = req.body;
-    if (!ip) return res.status(400).json({ error: 'IP required' });
-    const result = await User.updateMany({ lastIp: ip }, { blacklisted: true });
-    res.json({ success: true, count: result.modifiedCount });
+    console.log('🚫 Blacklist IP:', ip);
+    
+    if (!ip) {
+      return res.status(400).json({ error: 'IP required' });
+    }
+    
+    // Zoek users met dit IP
+    const users = await User.find({ lastIp: ip });
+    console.log('👤 Users found with IP:', users.length);
+    
+    if (users.length === 0) {
+      return res.status(404).json({ error: 'No users found with this IP' });
+    }
+    
+    // Blacklist alle users met dit IP
+    let count = 0;
+    for (const user of users) {
+      user.blacklisted = true;
+      await user.save();
+      count++;
+    }
+    
+    res.json({ 
+      success: true, 
+      count: count,
+      message: `Blacklisted ${count} users with IP ${ip}`
+    });
   } catch (error) {
+    console.error('❌ Blacklist error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -134,9 +157,10 @@ router.delete('/blacklist/:userId', async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: 'User not found' });
+    
     user.blacklisted = false;
     await user.save();
-    res.json({ success: true });
+    res.json({ success: true, message: 'User unblacklisted' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
