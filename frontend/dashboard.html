@@ -21,9 +21,7 @@
         .plan-badge.pro{background:rgba(124,58,237,0.2);color:#a78bfa;border:1px solid rgba(124,58,237,0.3);box-shadow:0 0 20px rgba(124,58,237,0.1)}
         .plan-badge.elite{background:rgba(124,58,237,0.2);color:#a78bfa;border:1px solid rgba(124,58,237,0.3);box-shadow:0 0 20px rgba(124,58,237,0.1)}
         .plan-badge.lifetime{background:rgba(241,196,15,0.15);color:#f1c40f;border:1px solid rgba(241,196,15,0.2);box-shadow:0 0 20px rgba(241,196,15,0.05)}
-        .role-badge.user{background:rgba(255,255,255,0.04);color:#666688;border:1px solid rgba(255,255,255,0.04);display:inline-block;padding:2px 12px;border-radius:20px;font-size:0.6rem;font-weight:700;text-transform:uppercase;margin-left:8px}
-        .role-badge.mod{background:rgba(52,152,219,0.2);color:#5dade2;border:1px solid rgba(52,152,219,0.3);box-shadow:0 0 20px rgba(52,152,219,0.1);display:inline-block;padding:2px 12px;border-radius:20px;font-size:0.6rem;font-weight:700;text-transform:uppercase;margin-left:8px}
-        .role-badge.admin{background:rgba(241,196,15,0.2);color:#f1c40f;border:1px solid rgba(241,196,15,0.3);box-shadow:0 0 20px rgba(241,196,15,0.15);display:inline-block;padding:2px 12px;border-radius:20px;font-size:0.6rem;font-weight:700;text-transform:uppercase;margin-left:8px}
+        .plan-badge.owner{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:1px solid #7c3aed;box-shadow:0 0 30px rgba(124,58,237,0.2)}
         .header a{color:#666688;text-decoration:none;font-size:0.8rem;font-weight:600;transition:all 0.3s ease;padding:4px 0;position:relative}
         .header a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:#7c3aed;transition:width 0.3s ease;border-radius:2px}
         .header a:hover{color:#a78bfa}
@@ -90,10 +88,8 @@
                 <span class="user-info">
                     <span id="userEmail">loading...</span>
                     <span id="userPlan" class="plan-badge free">FREE</span>
-                    <span id="userRoleBadge" class="role-badge user" style="display:none;">USER</span>
-                    <a href="plans.html">Plans</a>
-                    <a href="admin-login.html" id="adminLink" style="display:none;">⚙️ Admin</a>
-                    <a href="mod-panel.html" id="modLink" style="display:none;">🛡️ Mod</a>
+                    <a href="plans.html" id="plansLink">Plans</a>
+                    <a href="owner-panel.html" id="ownerLink" style="display:none;">👑 Owner Panel</a>
                 </span>
                 <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
@@ -157,26 +153,13 @@
                 document.getElementById('userPlan').className = 'plan-badge ' + user.plan;
                 if (user.webhook) document.getElementById('webhookInput').value = user.webhook;
                 
-                // Role badge
-                const roleBadge = document.getElementById('userRoleBadge');
-                if (user.role === 'admin' || user.role === 'mod') {
-                    roleBadge.style.display = 'inline-block';
-                    roleBadge.textContent = user.role.toUpperCase();
-                    roleBadge.className = 'role-badge ' + user.role;
-                } else {
-                    roleBadge.style.display = 'none';
-                }
-                
-                // Admin/Mod links
-                if (user.role === 'admin') {
-                    document.getElementById('adminLink').style.display = 'inline-block';
-                    document.getElementById('modLink').style.display = 'inline-block';
+                // Check if Owner
+                if (user.isOwner || user.role === 'owner') {
+                    document.getElementById('ownerLink').style.display = 'inline-block';
+                    document.getElementById('userPlan').textContent = '👑 OWNER';
+                    document.getElementById('userPlan').className = 'plan-badge owner';
                     document.querySelector('#upgradeSection p').innerHTML = 
-                        '👑 You are an <span class="highlight">Admin</span> - Unlimited deploys!';
-                } else if (user.role === 'mod') {
-                    document.getElementById('modLink').style.display = 'inline-block';
-                    document.querySelector('#upgradeSection p').innerHTML = 
-                        '⭐ You are a <span class="highlight" style="color:#5dade2;">Moderator</span> - 50 deploys/day!';
+                        '👑 You are the <span class="highlight">Owner</span> - Unlimited everything!';
                 }
                 
                 loadDeployments();
@@ -270,14 +253,13 @@
                 if (user.plan === 'pro') limit = 10;
                 if (user.plan === 'elite') limit = 50;
                 if (user.plan === 'lifetime') limit = 999;
-                if (user.role === 'admin') limit = Infinity;
-                if (user.role === 'mod') limit = 50;
+                if (user.isOwner || user.role === 'owner') limit = Infinity;
                 
                 const today = new Date().toDateString();
                 const todayDeploys = data.deployments ? data.deployments.filter(d => new Date(d.createdAt).toDateString() === today).length : 0;
                 document.getElementById('deploysUsed').textContent = todayDeploys;
                 
-                if (user.role === 'admin') {
+                if (user.isOwner || user.role === 'owner') {
                     document.getElementById('deploysLeft').textContent = '∞';
                 } else {
                     document.getElementById('deploysLeft').textContent = Math.max(0, limit - todayDeploys);
