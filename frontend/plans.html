@@ -14,11 +14,55 @@
         body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(124,58,237,0.04) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(124,58,237,0.03) 0%,transparent 60%);pointer-events:none;z-index:0}
         .container{max-width:1100px;margin:0 auto;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:24px;padding:40px;backdrop-filter:blur(10px);position:relative;z-index:1;transition:all 0.4s ease}
         .container:hover{border-color:rgba(124,58,237,0.08)}
-        .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;flex-wrap:wrap;gap:10px}
+        .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
         .header h1{font-size:2.8rem;font-weight:900;background:linear-gradient(135deg,#7c3aed 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
         .header .sub{color:#666688;font-size:1rem;font-weight:400;margin-top:4px}
         .header a{color:#444466;text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.3s}
         .header a:hover{color:#a78bfa}
+        
+        /* CONTACT BANNER BOVENIN */
+        .contact-banner {
+            background: rgba(124,58,237,0.06);
+            border: 1px solid rgba(124,58,237,0.12);
+            border-radius: 12px;
+            padding: 12px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .contact-banner .text {
+            color: #8888aa;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .contact-banner .text strong {
+            color: #a78bfa;
+        }
+        .contact-banner .btn-contact {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .contact-banner .btn-contact:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+        }
+
         .pricing-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:20px}
         @media(max-width:992px){.pricing-grid{grid-template-columns:1fr 1fr}}
         @media(max-width:576px){.pricing-grid{grid-template-columns:1fr}}
@@ -195,6 +239,16 @@
             <a href="dashboard.html">← Back to Dashboard</a>
         </div>
 
+        <!-- ===== CONTACT BANNER BOVENIN ===== -->
+        <div class="contact-banner">
+            <div class="text">
+                💬 Need help or want to upgrade? Contact <strong>@briefjes</strong> on Discord
+            </div>
+            <button class="btn-contact" onclick="copyDiscord()">
+                📋 Copy @briefjes
+            </button>
+        </div>
+
         <div class="pricing-grid">
             <!-- FREE -->
             <div class="plan" id="planFree">
@@ -320,7 +374,7 @@
     <div id="toastContainer"></div>
 
     <script>
-        // Check user's current plan and show toast
+        // Check user's current plan
         async function checkUserPlan() {
             const token = localStorage.getItem('token');
             if (!token) return;
@@ -333,33 +387,24 @@
                 const data = await res.json();
                 const user = data.user;
 
-                // If user is on Free, disable the Free button
                 if (user.plan === 'free') {
                     document.getElementById('freeBtn').textContent = '✅ Current Plan';
                     document.getElementById('freeBtn').className = 'btn btn-current';
                 }
-
-                // If user is on Pro, disable Pro button and show current
                 if (user.plan === 'pro') {
                     document.querySelector('.plan.popular .btn').textContent = '✅ Current Plan';
                     document.querySelector('.plan.popular .btn').className = 'btn btn-current';
                 }
-
-                // If user is on Elite, disable Elite button
                 if (user.plan === 'elite') {
                     const eliteBtn = document.querySelector('.plan:nth-child(3) .btn');
                     eliteBtn.textContent = '✅ Current Plan';
                     eliteBtn.className = 'btn btn-current';
                 }
-
-                // If user is on Lifetime, disable Lifetime button
                 if (user.plan === 'lifetime') {
                     const lifetimeBtn = document.querySelector('.plan:nth-child(4) .btn');
                     lifetimeBtn.textContent = '✅ Current Plan';
                     lifetimeBtn.className = 'btn btn-current';
                 }
-
-                // If user is owner
                 if (user.role === 'owner') {
                     document.querySelectorAll('.plan .btn').forEach(btn => {
                         btn.textContent = '👑 Owner';
@@ -368,15 +413,6 @@
                         btn.style.borderColor = 'rgba(241,196,15,0.3)';
                     });
                 }
-
-                // Show toast if user clicked "Get Started" on Free
-                const urlParams = new URLSearchParams(window.location.search);
-                if (urlParams.get('free') === 'true') {
-                    showToast('You are already on the Free plan!', 'info');
-                    // Remove from URL
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                }
-
             } catch (e) {
                 console.error(e);
             }
@@ -392,15 +428,18 @@
             document.getElementById('upgradeModal').classList.remove('show');
         }
 
+        // ===== COPY DISCORD =====
         function copyDiscord() {
             const discord = '@briefjes';
             navigator.clipboard.writeText(discord).then(() => {
-                const btn = document.querySelector('.modal-btn-primary');
-                const originalText = btn.textContent;
-                btn.textContent = '✅ Copied!';
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                }, 2000);
+                const btn = document.querySelector('.modal-btn-primary') || document.querySelector('.btn-contact');
+                if (btn) {
+                    const originalText = btn.textContent;
+                    btn.textContent = '✅ Copied!';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                    }, 2000);
+                }
             }).catch(() => {
                 alert('Copy: ' + discord);
             });
