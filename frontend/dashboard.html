@@ -765,11 +765,20 @@
             const btn = document.getElementById('deployBtn');
             const status = document.getElementById('deployStatus');
             const spinner = document.getElementById('deploySpinner');
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                status.textContent = '❌ Please login first';
+                status.style.color = '#e74c5e';
+                return;
+            }
+            
             btn.disabled = true;
             btn.textContent = 'Deploying...';
             spinner.classList.add('show');
             status.textContent = '';
             status.style.color = '';
+            
             try {
                 const res = await fetch(API_URL + '/api/deploy/new', {
                     method: 'POST',
@@ -780,6 +789,7 @@
                 });
                 const data = await res.json();
                 spinner.classList.remove('show');
+                
                 if (!res.ok) {
                     status.textContent = '❌ ' + (data.error || 'Something went wrong');
                     status.style.color = '#e74c5e';
