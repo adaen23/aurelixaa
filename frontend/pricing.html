@@ -12,41 +12,165 @@
         *{margin:0;padding:0;box-sizing:border-box}
         body{background:#0a0a0f;color:#e8e8e8;font-family:'Inter',sans-serif;padding:24px;min-height:100vh;position:relative}
         body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(124,58,237,0.04) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(124,58,237,0.03) 0%,transparent 60%);pointer-events:none;z-index:0}
-        .container{max-width:600px;margin:0 auto;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:24px;padding:40px;backdrop-filter:blur(10px);position:relative;z-index:1;transition:all 0.4s ease}
+        .container{max-width:1200px;margin:0 auto;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:24px;padding:40px;backdrop-filter:blur(10px);position:relative;z-index:1;transition:all 0.4s ease}
         .container:hover{border-color:rgba(124,58,237,0.08)}
-        .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:10px}
-        .header h1{font-size:2rem;font-weight:900;background:linear-gradient(135deg,#7c3aed 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;flex-wrap:wrap;gap:10px}
+        .header h1{font-size:2.5rem;font-weight:900;background:linear-gradient(135deg,#7c3aed 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .header .sub{color:#666688;font-size:0.95rem;font-weight:400;margin-top:4px}
         .header a{color:#444466;text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.3s}
         .header a:hover{color:#a78bfa}
-        .pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-        .plan{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:14px;padding:20px 16px;text-align:center;transition:all 0.4s ease}
-        .plan:hover{border-color:rgba(124,58,237,0.15);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.2)}
-        .plan.popular{border-color:rgba(124,58,237,0.15);background:rgba(124,58,237,0.03)}
-        .plan .badge{display:inline-block;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;padding:1px 14px;border-radius:20px;font-size:0.5rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
-        .plan .name{color:#e8e8e8;font-weight:700;font-size:1rem}
-        .plan .price{color:#a78bfa;font-weight:900;font-size:1.8rem}
-        .plan .price span{color:#666688;font-size:0.7rem;font-weight:400}
-        .plan .features{color:#666688;font-size:0.7rem;margin:10px 0;line-height:1.8}
-        .plan .btn{background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.3s ease;font-family:inherit;width:100%;box-shadow:0 4px 15px rgba(124,58,237,0.1)}
-        .plan .btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(124,58,237,0.2)}
-        .plan .btn.outline{background:transparent;border:1px solid rgba(124,58,237,0.2);color:#a78bfa;box-shadow:none}
-        .plan .btn.outline:hover{background:rgba(124,58,237,0.04);border-color:rgba(124,58,237,0.3)}
-        .footer{color:#444466;text-align:center;font-size:0.75rem;margin-top:28px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.03)}
-        .footer a{color:#a78bfa;text-decoration:none}
-        .footer a:hover{color:#c4b5fd}
+        .pricing-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px}
+        @media(max-width:900px){.pricing-grid{grid-template-columns:1fr 1fr}}
         @media(max-width:500px){.pricing-grid{grid-template-columns:1fr}}
+        .plan{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:16px;padding:24px 20px;text-align:center;transition:all 0.4s ease;position:relative;overflow:hidden}
+        .plan:hover{border-color:rgba(124,58,237,0.15);transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+        .plan.popular{border-color:rgba(124,58,237,0.2);background:rgba(124,58,237,0.04)}
+        .plan.popular::before{content:'🔥 POPULAR';position:absolute;top:12px;right:-28px;transform:rotate(45deg);background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;padding:4px 40px;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+        .plan .name{font-size:1.3rem;font-weight:700;color:#e8e8e8;margin-bottom:4px}
+        .plan .price{font-size:2.8rem;font-weight:900;color:#a78bfa;margin:8px 0}
+        .plan .price span{font-size:0.9rem;color:#666688;font-weight:400}
+        .plan .price .old{text-decoration:line-through;color:#444466;font-size:1.2rem;font-weight:400;margin-right:8px}
+        .plan .badge{display:inline-block;background:rgba(124,58,237,0.15);color:#a78bfa;padding:2px 14px;border-radius:20px;font-size:0.6rem;font-weight:600;margin-bottom:8px}
+        .plan .features{list-style:none;padding:0;margin:16px 0;text-align:left}
+        .plan .features li{color:#8888aa;font-size:0.8rem;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;gap:8px}
+        .plan .features li .check{color:#4eff6a;font-weight:700}
+        .plan .features li .cross{color:#e74c5e;font-weight:700}
+        .plan .features li .highlight{color:#a78bfa;font-weight:600}
+        .plan .btn{width:100%;padding:12px;border-radius:10px;border:none;font-size:0.9rem;font-weight:700;cursor:pointer;transition:all 0.3s ease;font-family:inherit;margin-top:8px}
+        .plan .btn-primary{background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);color:#fff;box-shadow:0 4px 20px rgba(124,58,237,0.15)}
+        .plan .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(124,58,237,0.25)}
+        .plan .btn-outline{background:transparent;border:1px solid rgba(124,58,237,0.2);color:#a78bfa}
+        .plan .btn-outline:hover{background:rgba(124,58,237,0.06);transform:translateY(-2px)}
+        .footer{color:#444466;text-align:center;font-size:0.75rem;margin-top:32px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.03)}
+        .footer a{color:#a78bfa;text-decoration:none}
+        .footer a:hover{text-decoration:underline}
+        .features-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:32px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.04)}
+        @media(max-width:700px){.features-grid{grid-template-columns:1fr 1fr}}
+        @media(max-width:400px){.features-grid{grid-template-columns:1fr}}
+        .feature-item{background:rgba(255,255,255,0.02);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;transition:all 0.3s}
+        .feature-item:hover{background:rgba(255,255,255,0.04)}
+        .feature-item .icon{font-size:1.5rem;flex-shrink:0}
+        .feature-item .fname{font-weight:600;font-size:0.85rem;color:#e8e8e8}
+        .feature-item .fdesc{font-size:0.7rem;color:#666688}
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header"><h1>💰 Pricing</h1><a href="index.html">← Back</a></div>
-        <div class="pricing-grid">
-            <div class="plan"><div class="name">Free</div><div class="price">$0 <span>/forever</span></div><div class="features">⚡ 2 deploys/day<br>⏰ 1 hour expiry<br>📊 Basic stats</div><button class="btn outline" onclick="window.location.href='register.html'">Get Started</button></div>
-            <div class="plan popular"><div class="badge">🔥 Popular</div><div class="name">Pro</div><div class="price">$9.99 <span>/month</span></div><div class="features">⚡ 10 deploys/day<br>⏰ 24 hour expiry<br>🛡️ VPN Detection<br>📊 Full logs</div><button class="btn" onclick="alert('💳 Contact @briefjes on Discord to upgrade')">Upgrade</button></div>
-            <div class="plan"><div class="name">Elite</div><div class="price">$15 <span>/month</span></div><div class="features">⚡ 50 deploys/day<br>⏰ 48 hour expiry<br>🛡️ VPN Detection<br>🎨 Custom branding</div><button class="btn outline" onclick="alert('💳 Contact @briefjes on Discord to upgrade')">Upgrade</button></div>
-            <div class="plan"><div class="name">Lifetime</div><div class="price">$25 <span>/one-time</span></div><div class="features">⚡ Unlimited deploys<br>⏰ Forever active<br>🛡️ All features<br>👑 Priority support</div><button class="btn outline" onclick="alert('💳 Contact @briefjes on Discord to upgrade')">Get</button></div>
+        <div class="header">
+            <div>
+                <h1>💰 Pricing</h1>
+                <div class="sub">Choose your plan and unlock everything</div>
+            </div>
+            <a href="index.html">← Back to Home</a>
         </div>
-        <div class="footer">💬 Contact <a href="https://discord.com/users/briefjes">@briefjes</a> on Discord</div>
+
+        <div class="pricing-grid">
+            <!-- FREE -->
+            <div class="plan">
+                <div class="name">Free</div>
+                <div class="price">$0 <span>/forever</span></div>
+                <ul class="features">
+                    <li><span class="check">✅</span> 2 deploys/day</li>
+                    <li><span class="check">✅</span> 1 hour active</li>
+                    <li><span class="check">✅</span> Basic stats</li>
+                    <li><span class="cross">❌</span> VPN detection</li>
+                    <li><span class="cross">❌</span> Full logs</li>
+                    <li><span class="cross">❌</span> Custom branding</li>
+                </ul>
+                <button class="btn btn-outline" onclick="window.location.href='register.html'">Get Started</button>
+            </div>
+
+            <!-- PRO -->
+            <div class="plan popular">
+                <div class="badge">🔥 MOST POPULAR</div>
+                <div class="name">Pro</div>
+                <div class="price">$9.99 <span>/month</span></div>
+                <ul class="features">
+                    <li><span class="check">✅</span> 10 deploys/day</li>
+                    <li><span class="check">✅</span> 24 hours active</li>
+                    <li><span class="check">✅</span> Full stats & logs</li>
+                    <li><span class="check">✅</span> VPN detection</li>
+                    <li><span class="check">✅</span> Discord alerts</li>
+                    <li><span class="check">✅</span> IP tracking</li>
+                    <li><span class="check">✅</span> Real-time webhooks</li>
+                    <li><span class="check">✅</span> Mobile ready</li>
+                    <li><span class="cross">❌</span> Custom branding</li>
+                </ul>
+                <button class="btn btn-primary" onclick="alert('💳 Contact @briefjes on Discord')">Upgrade</button>
+            </div>
+
+            <!-- ELITE -->
+            <div class="plan">
+                <div class="badge">⚡ BEST VALUE</div>
+                <div class="name">Elite</div>
+                <div class="price">$15 <span>/month</span></div>
+                <ul class="features">
+                    <li><span class="check">✅</span> 50 deploys/day</li>
+                    <li><span class="check">✅</span> 48 hours active</li>
+                    <li><span class="check">✅</span> Full stats & logs</li>
+                    <li><span class="check">✅</span> VPN detection</li>
+                    <li><span class="check">✅</span> Discord alerts</li>
+                    <li><span class="check">✅</span> IP tracking</li>
+                    <li><span class="check">✅</span> Real-time webhooks</li>
+                    <li><span class="check">✅</span> Mobile ready</li>
+                    <li><span class="check">✅</span> Custom branding</li>
+                    <li><span class="check">✅</span> Advanced analytics</li>
+                </ul>
+                <button class="btn btn-outline" onclick="alert('💳 Contact @briefjes on Discord')">Upgrade</button>
+            </div>
+
+            <!-- LIFETIME -->
+            <div class="plan">
+                <div class="badge">👑 UNLIMITED</div>
+                <div class="name">Lifetime</div>
+                <div class="price">$25 <span>/one-time</span></div>
+                <ul class="features">
+                    <li><span class="check">✅</span> Unlimited deploys</li>
+                    <li><span class="check">✅</span> Forever active</li>
+                    <li><span class="check">✅</span> Full stats & logs</li>
+                    <li><span class="check">✅</span> VPN detection</li>
+                    <li><span class="check">✅</span> Discord alerts</li>
+                    <li><span class="check">✅</span> IP tracking</li>
+                    <li><span class="check">✅</span> Real-time webhooks</li>
+                    <li><span class="check">✅</span> Mobile ready</li>
+                    <li><span class="check">✅</span> Custom branding</li>
+                    <li><span class="check">✅</span> Advanced analytics</li>
+                    <li><span class="check">✅</span> Priority support</li>
+                    <li><span class="check">✅</span> Lifetime updates</li>
+                </ul>
+                <button class="btn btn-primary" onclick="alert('💳 Contact @briefjes on Discord')">Get Lifetime</button>
+            </div>
+        </div>
+
+        <!-- ALL FEATURES -->
+        <div class="features-grid">
+            <div class="feature-item"><span class="icon">⚡</span><div><div class="fname">Instant Deploy</div><div class="fdesc">Links in 1 second</div></div></div>
+            <div class="feature-item"><span class="icon">🛡️</span><div><div class="fname">VPN Detection</div><div class="fdesc">Advanced proxy detection</div></div></div>
+            <div class="feature-item"><span class="icon">📊</span><div><div class="fname">Live Stats</div><div class="fdesc">Real-time visitor tracking</div></div></div>
+            <div class="feature-item"><span class="icon">🔗</span><div><div class="fname">Custom Links</div><div class="fdesc">Your own subdomain</div></div></div>
+            <div class="feature-item"><span class="icon">🌍</span><div><div class="fname">IP Tracking</div><div class="fdesc">Full geo-location data</div></div></div>
+            <div class="feature-item"><span class="icon">📱</span><div><div class="fname">Mobile Ready</div><div class="fdesc">Works on all devices</div></div></div>
+            <div class="feature-item"><span class="icon">🔒</span><div><div class="fname">Private Links</div><div class="fdesc">Auto-expire after set time</div></div></div>
+            <div class="feature-item"><span class="icon">🎯</span><div><div class="fname">Discord Alerts</div><div class="fdesc">Real-time webhook notifications</div></div></div>
+            <div class="feature-item"><span class="icon">🔄</span><div><div class="fname">Auto-Delete</div><div class="fdesc">Expired links auto-removed</div></div></div>
+            <div class="feature-item"><span class="icon">📈</span><div><div class="fname">Analytics</div><div class="fdesc">Track performance & visits</div></div></div>
+            <div class="feature-item"><span class="icon">🎨</span><div><div class="fname">Custom Branding</div><div class="fdesc">Your own logo & colors</div></div></div>
+            <div class="feature-item"><span class="icon">👑</span><div><div class="fname">Priority Support</div><div class="fdesc">Fast response time</div></div></div>
+            <div class="feature-item"><span class="icon">🔔</span><div><div class="fname">Email Alerts</div><div class="fdesc">Get notified on every visit</div></div></div>
+            <div class="feature-item"><span class="icon">📋</span><div><div class="fname">Export Data</div><div class="fdesc">Download logs as CSV</div></div></div>
+            <div class="feature-item"><span class="icon">🕒</span><div><div class="fname">History Logs</div><div class="fdesc">View all past deployments</div></div></div>
+            <div class="feature-item"><span class="icon">⚙️</span><div><div class="fname">API Access</div><div class="fdesc">Full REST API integration</div></div></div>
+            <div class="feature-item"><span class="icon">🔐</span><div><div class="fname">Secure Links</div><div class="fdesc">HTTPS + encrypted</div></div></div>
+            <div class="feature-item"><span class="icon">🚀</span><div><div class="fname">Fast CDN</div><div class="fdesc">Global content delivery</div></div></div>
+            <div class="feature-item"><span class="icon">💾</span><div><div class="fname">Backup</div><div class="fdesc">Data backup & recovery</div></div></div>
+            <div class="feature-item"><span class="icon">🔎</span><div><div class="fname">Search</div><div class="fdesc">Search through logs</div></div></div>
+            <div class="feature-item"><span class="icon">📦</span><div><div class="fname">Bulk Deploy</div><div class="fdesc">Deploy multiple links</div></div></div>
+            <div class="feature-item"><span class="icon">🌐</span><div><div class="fname">Multi-language</div><div class="fdesc">Support for all languages</div></div></div>
+        </div>
+
+        <div class="footer">
+            💬 Contact <a href="https://discord.com/users/briefjes">@briefjes</a> on Discord for upgrades or questions
+        </div>
     </div>
 </body>
 </html>
