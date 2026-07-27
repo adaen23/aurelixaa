@@ -12,7 +12,11 @@ const UserSchema = new mongoose.Schema({
   lastIp: { type: String, default: '' },
   totalVisits: { type: Number, default: 0 },
   blacklisted: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  brandColor: { type: String, default: '#7c3aed' },
+  brandName: { type: String, default: '' },
+  logoUrl: { type: String, default: '' },
+  apiKey: { type: String, default: '' }
 });
 
 module.exports = mongoose.model('User', UserSchema);
