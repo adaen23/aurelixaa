@@ -128,7 +128,7 @@
                     <li><span class="check">✅</span> History logs</li>
                     <li><span class="cross">❌</span> Custom branding</li>
                 </ul>
-                <button class="btn btn-primary" onclick="openModal('Pro')">Upgrade</button>
+                <button class="btn btn-primary" id="proBtn" onclick="openModal('Pro')">Upgrade</button>
             </div>
 
             <!-- ELITE -->
@@ -149,7 +149,7 @@
                     <li><span class="check">✅</span> Advanced analytics</li>
                     <li><span class="check">✅</span> History logs</li>
                 </ul>
-                <button class="btn btn-outline" onclick="openModal('Elite')">Upgrade</button>
+                <button class="btn btn-outline" id="eliteBtn" onclick="openModal('Elite')">Upgrade</button>
             </div>
 
             <!-- LIFETIME -->
@@ -171,7 +171,7 @@
                     <li><span class="check">✅</span> Priority support</li>
                     <li><span class="check">✅</span> Lifetime updates</li>
                 </ul>
-                <button class="btn btn-best" onclick="openModal('Lifetime')">Get Lifetime</button>
+                <button class="btn btn-best" id="lifetimeBtn" onclick="openModal('Lifetime')">Get Lifetime</button>
             </div>
         </div>
     </div>
@@ -206,7 +206,7 @@
     <div id="toastContainer"></div>
 
     <script>
-        // Check user's current plan
+        // ===== CHECK USER PLAN EN UPDATE KNOLLEN =====
         async function checkUserPlan() {
             const token = localStorage.getItem('token');
             if (!token) return;
@@ -219,34 +219,97 @@
                 const data = await res.json();
                 const user = data.user;
 
+                console.log('👤 User plan:', user.plan);
+                console.log('👤 User role:', user.role);
+
+                // Alle plan knoppen
+                const freeBtn = document.getElementById('freeBtn');
+                const proBtn = document.getElementById('proBtn');
+                const eliteBtn = document.getElementById('eliteBtn');
+                const lifetimeBtn = document.getElementById('lifetimeBtn');
+
+                // Reset alle knoppen naar origineel
+                if (freeBtn) {
+                    freeBtn.textContent = 'Get Started';
+                    freeBtn.className = 'btn btn-outline';
+                    freeBtn.onclick = function() { window.location.href = 'register.html'; };
+                }
+                if (proBtn) {
+                    proBtn.textContent = 'Upgrade';
+                    proBtn.className = 'btn btn-primary';
+                    proBtn.onclick = function() { openModal('Pro'); };
+                }
+                if (eliteBtn) {
+                    eliteBtn.textContent = 'Upgrade';
+                    eliteBtn.className = 'btn btn-outline';
+                    eliteBtn.onclick = function() { openModal('Elite'); };
+                }
+                if (lifetimeBtn) {
+                    lifetimeBtn.textContent = 'Get Lifetime';
+                    lifetimeBtn.className = 'btn btn-best';
+                    lifetimeBtn.onclick = function() { openModal('Lifetime'); };
+                }
+
+                // ===== CHECK WELK PLAN DE USER HEEFT =====
+                if (user.role === 'owner') {
+                    // Owner - alles gratis
+                    freeBtn.textContent = '👑 Owner';
+                    freeBtn.className = 'btn btn-current';
+                    freeBtn.style.color = '#f1c40f';
+                    freeBtn.style.borderColor = 'rgba(241,196,15,0.3)';
+                    proBtn.textContent = '👑 Owner';
+                    proBtn.className = 'btn btn-current';
+                    proBtn.style.color = '#f1c40f';
+                    proBtn.style.borderColor = 'rgba(241,196,15,0.3)';
+                    eliteBtn.textContent = '👑 Owner';
+                    eliteBtn.className = 'btn btn-current';
+                    eliteBtn.style.color = '#f1c40f';
+                    eliteBtn.style.borderColor = 'rgba(241,196,15,0.3)';
+                    lifetimeBtn.textContent = '👑 Owner';
+                    lifetimeBtn.className = 'btn btn-current';
+                    lifetimeBtn.style.color = '#f1c40f';
+                    lifetimeBtn.style.borderColor = 'rgba(241,196,15,0.3)';
+                    return;
+                }
+
+                // ===== FREE =====
                 if (user.plan === 'free') {
-                    document.getElementById('freeBtn').textContent = '✅ Current Plan';
-                    document.getElementById('freeBtn').className = 'btn btn-current';
+                    freeBtn.textContent = '✅ Current Plan';
+                    freeBtn.className = 'btn btn-current';
+                    freeBtn.onclick = null;
+                    freeBtn.style.color = '';
+                    freeBtn.style.borderColor = '';
                 }
+
+                // ===== PRO =====
                 if (user.plan === 'pro') {
-                    document.querySelector('.plan.popular .btn').textContent = '✅ Current Plan';
-                    document.querySelector('.plan.popular .btn').className = 'btn btn-current';
+                    proBtn.textContent = '✅ Current Plan';
+                    proBtn.className = 'btn btn-current';
+                    proBtn.onclick = null;
+                    proBtn.style.color = '';
+                    proBtn.style.borderColor = '';
                 }
+
+                // ===== ELITE =====
                 if (user.plan === 'elite') {
-                    const eliteBtn = document.querySelector('.plan:nth-child(3) .btn');
                     eliteBtn.textContent = '✅ Current Plan';
                     eliteBtn.className = 'btn btn-current';
+                    eliteBtn.onclick = null;
+                    eliteBtn.style.color = '';
+                    eliteBtn.style.borderColor = '';
                 }
+
+                // ===== LIFETIME =====
                 if (user.plan === 'lifetime') {
-                    const lifetimeBtn = document.querySelector('.plan:nth-child(4) .btn');
                     lifetimeBtn.textContent = '✅ Current Plan';
                     lifetimeBtn.className = 'btn btn-current';
+                    lifetimeBtn.onclick = null;
+                    lifetimeBtn.style.color = '';
+                    lifetimeBtn.style.borderColor = '';
                 }
-                if (user.role === 'owner') {
-                    document.querySelectorAll('.plan .btn').forEach(btn => {
-                        btn.textContent = '👑 Owner';
-                        btn.className = 'btn btn-current';
-                        btn.style.color = '#f1c40f';
-                        btn.style.borderColor = 'rgba(241,196,15,0.3)';
-                    });
-                }
+
             } catch (e) {
-                console.error(e);
+                console.error('❌ Error checking plan:', e);
             }
         }
 
