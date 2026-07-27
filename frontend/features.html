@@ -10,26 +10,26 @@
     <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#0a0a0f;color:#e8e8e8;font-family:'Inter',sans-serif;padding:24px;min-height:100vh;position:relative}
-        body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(124,58,237,0.04) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(124,58,237,0.03) 0%,transparent 60%);pointer-events:none;z-index:0}
-        .container{max-width:600px;margin:0 auto;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:24px;padding:40px;backdrop-filter:blur(10px);position:relative;z-index:1;transition:all 0.4s ease}
-        .container:hover{border-color:rgba(124,58,237,0.08)}
+        body{background:#0a0a0f;color:#f3f4f6;font-family:'Inter',sans-serif;padding:24px;min-height:100vh;position:relative}
+        body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(139,92,246,0.05) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(236,72,153,0.05) 0%,transparent 60%);pointer-events:none;z-index:0}
+        .container{max-width:600px;margin:0 auto;background:rgba(17,24,39,0.6);border:1px solid rgba(255,255,255,0.04);border-radius:24px;padding:40px;backdrop-filter:blur(10px);position:relative;z-index:1;transition:all 0.4s ease}
+        .container:hover{border-color:rgba(139,92,246,0.08)}
         .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:10px}
-        .header h1{font-size:2rem;font-weight:900;background:linear-gradient(135deg,#7c3aed 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .header h1{font-size:2rem;font-weight:900;background:linear-gradient(135deg,#8B5CF6 0%,#EC4899 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
         .header a{color:#444466;text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.3s}
-        .header a:hover{color:#a78bfa}
+        .header a:hover{color:#8B5CF6}
         .features-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
         .feature{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:14px;padding:20px 16px;text-align:center;transition:all 0.4s ease}
-        .feature:hover{border-color:rgba(124,58,237,0.15);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.2)}
+        .feature:hover{border-color:rgba(139,92,246,0.15);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.2)}
         .feature .icon{font-size:2.2rem;display:block;margin-bottom:6px}
-        .feature .name{color:#e8e8e8;font-size:0.9rem;font-weight:700;display:block}
-        .feature .desc{color:#666688;font-size:0.75rem;display:block;margin-top:4px;line-height:1.4}
-        .feature.highlight{border-color:rgba(124,58,237,0.15);background:rgba(124,58,237,0.03)}
-        .feature.highlight .name{color:#a78bfa}
+        .feature .name{color:#f3f4f6;font-size:0.9rem;font-weight:700;display:block}
+        .feature .desc{color:#9ca3af;font-size:0.75rem;display:block;margin-top:4px;line-height:1.4}
+        .feature.highlight{border-color:rgba(139,92,246,0.15);background:rgba(139,92,246,0.03)}
+        .feature.highlight .name{color:#8B5CF6}
         .vpn-badge{display:inline-block;background:rgba(231,76,94,0.1);color:#e74c5e;padding:2px 12px;border-radius:20px;font-size:0.55rem;font-weight:700;margin-top:6px;border:1px solid rgba(231,76,94,0.1)}
         .footer{color:#444466;text-align:center;font-size:0.75rem;margin-top:28px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.03)}
-        .footer a{color:#a78bfa;text-decoration:none}
-        .footer a:hover{color:#c4b5fd}
+        .footer a{color:#8B5CF6;text-decoration:none}
+        .footer a:hover{color:#EC4899}
         @media(max-width:500px){.features-grid{grid-template-columns:1fr}}
     </style>
 </head>
