@@ -134,7 +134,7 @@ router.get('/export/:subdomain', checkToken, async (req, res) => {
   }
 });
 
-// ===== EXPORT ALL LOGS (CSV) =====
+// ===== EXPORT ALL LOGS (CSV) - Pro+ =====
 router.get('/export-all', checkToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
@@ -159,7 +159,7 @@ router.get('/export-all', checkToken, async (req, res) => {
   }
 });
 
-// ===== BULK DEPLOY =====
+// ===== BULK DEPLOY (Elite+) =====
 router.post('/bulk', checkToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
