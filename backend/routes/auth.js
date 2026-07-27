@@ -95,7 +95,9 @@ router.post('/login', async (req, res) => {
         email: user.email, 
         plan: user.plan, 
         webhook: user.webhook, 
-        discord: user.discord 
+        discord: user.discord,
+        role: user.role,
+        isOwner: user.role === 'owner' || user.isOwner || false
       } 
     });
   } catch (error) {
@@ -128,7 +130,9 @@ router.get('/me', async (req, res) => {
         email: user.email, 
         plan: user.plan, 
         webhook: user.webhook, 
-        discord: user.discord 
+        discord: user.discord,
+        role: user.role || 'user',
+        isOwner: user.role === 'owner' || user.isOwner || false
       } 
     });
   } catch (error) {
