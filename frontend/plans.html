@@ -108,7 +108,7 @@
                     <li><span class="cross">❌</span> Full logs</li>
                     <li><span class="cross">❌</span> Custom branding</li>
                 </ul>
-                <button class="btn btn-current" id="freeBtn">✅ Current Plan</button>
+                <button class="btn btn-outline" id="freeBtn" onclick="window.location.href='register.html'">Get Started</button>
             </div>
 
             <!-- PRO -->
@@ -209,7 +209,10 @@
         // ===== CHECK USER PLAN EN UPDATE KNOLLEN =====
         async function checkUserPlan() {
             const token = localStorage.getItem('token');
-            if (!token) return;
+            if (!token) {
+                // Niet ingelogd, Free knop blijft "Get Started" naar register
+                return;
+            }
 
             try {
                 const res = await fetch('https://api.aurelixa.online/api/auth/me', {
@@ -222,18 +225,12 @@
                 console.log('👤 User plan:', user.plan);
                 console.log('👤 User role:', user.role);
 
-                // Alle plan knoppen
                 const freeBtn = document.getElementById('freeBtn');
                 const proBtn = document.getElementById('proBtn');
                 const eliteBtn = document.getElementById('eliteBtn');
                 const lifetimeBtn = document.getElementById('lifetimeBtn');
 
-                // Reset alle knoppen naar origineel
-                if (freeBtn) {
-                    freeBtn.textContent = 'Get Started';
-                    freeBtn.className = 'btn btn-outline';
-                    freeBtn.onclick = function() { window.location.href = 'register.html'; };
-                }
+                // Reset Pro/Elite/Lifetime knoppen naar origineel
                 if (proBtn) {
                     proBtn.textContent = 'Upgrade';
                     proBtn.className = 'btn btn-primary';
@@ -250,23 +247,26 @@
                     lifetimeBtn.onclick = function() { openModal('Lifetime'); };
                 }
 
-                // ===== CHECK WELK PLAN DE USER HEEFT =====
+                // ===== OWNER =====
                 if (user.role === 'owner') {
-                    // Owner - alles gratis
                     freeBtn.textContent = '👑 Owner';
                     freeBtn.className = 'btn btn-current';
+                    freeBtn.onclick = null;
                     freeBtn.style.color = '#f1c40f';
                     freeBtn.style.borderColor = 'rgba(241,196,15,0.3)';
                     proBtn.textContent = '👑 Owner';
                     proBtn.className = 'btn btn-current';
+                    proBtn.onclick = null;
                     proBtn.style.color = '#f1c40f';
                     proBtn.style.borderColor = 'rgba(241,196,15,0.3)';
                     eliteBtn.textContent = '👑 Owner';
                     eliteBtn.className = 'btn btn-current';
+                    eliteBtn.onclick = null;
                     eliteBtn.style.color = '#f1c40f';
                     eliteBtn.style.borderColor = 'rgba(241,196,15,0.3)';
                     lifetimeBtn.textContent = '👑 Owner';
                     lifetimeBtn.className = 'btn btn-current';
+                    lifetimeBtn.onclick = null;
                     lifetimeBtn.style.color = '#f1c40f';
                     lifetimeBtn.style.borderColor = 'rgba(241,196,15,0.3)';
                     return;
@@ -277,6 +277,12 @@
                     freeBtn.textContent = '✅ Current Plan';
                     freeBtn.className = 'btn btn-current';
                     freeBtn.onclick = null;
+                    freeBtn.style.color = '';
+                    freeBtn.style.borderColor = '';
+                } else {
+                    freeBtn.textContent = 'Get Started';
+                    freeBtn.className = 'btn btn-outline';
+                    freeBtn.onclick = function() { window.location.href = 'register.html'; };
                     freeBtn.style.color = '';
                     freeBtn.style.borderColor = '';
                 }
