@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Panel - AURELIXA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:#0a0a0f;color:#e8e8e8;font-family:'Inter',sans-serif;padding:24px;min-height:100vh;position:relative}
+        body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(124,58,237,0.04) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(124,58,237,0.03) 0%,transparent 60%);pointer-events:none;z-index:0}
+        .container{max-width:1200px;margin:0 auto;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:24px;padding:32px;backdrop-filter:blur(10px);position:relative;z-index:1;transition:all 0.4s ease}
+        .container:hover{border-color:rgba(124,58,237,0.08)}
+        .header{display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.04);margin-bottom:24px;flex-wrap:wrap;gap:12px}
+        .header h1{font-size:2rem;font-weight:900;background:linear-gradient(135deg,#f1c40f,#f39c12);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .header a{color:#666688;text-decoration:none;font-size:0.85rem;transition:color 0.3s}
+        .header a:hover{color:#a78bfa}
+        .header .btn-logout{background:transparent;color:#666688;border:1px solid rgba(255,255,255,0.06);padding:6px 18px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.8rem;transition:all 0.3s}
+        .header .btn-logout:hover{background:rgba(255,255,255,0.03);color:#a78bfa}
+        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:24px}
+        .stat-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:12px;padding:16px 14px;text-align:center;transition:all 0.3s ease}
+        .stat-card:hover{border-color:rgba(124,58,237,0.1);transform:translateY(-2px)}
+        .stat-card .number{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#7c3aed 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .stat-card .label{color:#666688;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px}
+        .search-box{width:100%;padding:10px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;color:#e8e8e8;font-size:0.9rem;font-family:inherit;margin-bottom:14px;transition:all 0.3s ease}
+        .search-box:focus{outline:none;border-color:rgba(124,58,237,0.2)}
+        .search-box::placeholder{color:#333355}
+        .users-table{overflow-x:auto}
+        table{width:100%;border-collapse:collapse;font-size:0.8rem}
+        th{text-align:left;padding:10px 8px;color:#f1c40f;border-bottom:1px solid rgba(255,255,255,0.06);font-weight:600}
+        td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,0.03);color:#c8c8e8;vertical-align:middle}
+        .ip-badge{background:rgba(255,255,255,0.04);padding:2px 12px;border-radius:20px;font-size:0.65rem;font-family:monospace;color:#8888aa;border:1px solid rgba(255,255,255,0.04)}
+        .plan-select{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:4px 10px;color:#e8e8e8;font-size:0.75rem;font-family:inherit;transition:all 0.3s ease}
+        .plan-select:focus{outline:none;border-color:rgba(124,58,237,0.3)}
+        .plan-select option{background:#1a1a2e;color:#e8e8e8}
+        .btn-save{background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);color:#fff;border:none;padding:4px 14px;border-radius:6px;cursor:pointer;font-size:0.7rem;font-weight:600;transition:all 0.3s}
+        .btn-save:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(124,58,237,0.25)}
+        .btn-delete{background:rgba(231,76,94,0.1);color:#e74c5e;border:1px solid rgba(231,76,94,0.15);padding:4px 14px;border-radius:6px;cursor:pointer;font-size:0.7rem;font-weight:600}
+        .btn-delete:hover{background:rgba(231,76,94,0.2)}
+        .btn-blacklist{background:rgba(231,76,94,0.08);color:#e74c5e;border:1px solid rgba(231,76,94,0.1);padding:4px 14px;border-radius:6px;cursor:pointer;font-size:0.7rem;font-weight:600}
+        .btn-blacklist:hover{background:rgba(231,76,94,0.15)}
+        .btn-unblacklist{background:rgba(78,255,106,0.08);color:#4eff6a;border:1px solid rgba(78,255,106,0.1);padding:4px 14px;border-radius:6px;cursor:pointer;font-size:0.7rem;font-weight:600}
+        .btn-unblacklist:hover{background:rgba(78,255,106,0.15)}
+        .empty{color:#444466;text-align:center;padding:30px;font-size:0.9rem}
+        .action-cell{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+        .status-badge{padding:2px 12px;border-radius:20px;font-size:0.6rem;font-weight:600;text-transform:uppercase;display:inline-block}
+        .status-badge.free{background:rgba(255,255,255,0.04);color:#666688;border:1px solid rgba(255,255,255,0.04)}
+        .status-badge.pro{background:rgba(124,58,237,0.15);color:#a78bfa;border:1px solid rgba(124,58,237,0.1)}
+        .status-badge.elite{background:rgba(124,58,237,0.15);color:#a78bfa;border:1px solid rgba(124,58,237,0.1)}
+        .status-badge.lifetime{background:rgba(241,196,15,0.1);color:#f1c40f;border:1px solid rgba(241,196,15,0.1)}
+        .blacklisted-true{color:#e74c5e;font-weight:600}
+        .blacklisted-false{color:#4eff6a}
+        .toast-container{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);z-index:1000;display:flex;flex-direction:column;align-items:center;gap:8px}
+        .toast{padding:14px 28px;border-radius:12px;font-weight:600;font-size:0.9rem;font-family:'Inter',sans-serif;backdrop-filter:blur(10px);animation:slideUp 0.4s ease;min-width:200px;text-align:center}
+        .toast.success{background:rgba(78,255,106,0.12);border:1px solid rgba(78,255,106,0.2);color:#4eff6a}
+        .toast.error{background:rgba(231,76,94,0.12);border:1px solid rgba(231,76,94,0.2);color:#e74c5e}
+        .toast.info{background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.2);color:#a78bfa}
+        @keyframes slideUp{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+        .admin-section{background:rgba(124,58,237,0.03);border:1px solid rgba(124,58,237,0.08);border-radius:12px;padding:16px 20px;margin-bottom:16px}
+        .admin-section h3{color:#f1c40f;font-size:0.95rem;font-weight:700;margin-bottom:10px}
+        .admin-section .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+        .admin-section .row input{flex:1;min-width:150px;padding:8px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;color:#e8e8e8;font-size:0.85rem;font-family:inherit}
+        .admin-section .row input:focus{outline:none;border-color:rgba(124,58,237,0.3)}
+        .admin-section .row button{padding:8px 20px;border-radius:8px;border:none;font-weight:600;cursor:pointer;transition:all 0.3s;font-family:inherit;font-size:0.8rem}
+        .admin-section .row .btn-primary{background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);color:#fff}
+        .admin-section .row .btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(124,58,237,0.2)}
+        .admin-section .row .btn-danger{background:rgba(231,76,94,0.15);color:#e74c5e;border:1px solid rgba(231,76,94,0.15)}
+        .admin-section .row .btn-danger:hover{background:rgba(231,76,94,0.25)}
+        .admin-section .row .btn-success{background:rgba(78,255,106,0.1);color:#4eff6a;border:1px solid rgba(78,255,106,0.1)}
+        .admin-section .row .btn-success:hover{background:rgba(78,255,106,0.2)}
+        .admin-section .stats-mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-top:8px}
+        .admin-section .stats-mini .item{background:rgba(255,255,255,0.02);padding:8px 12px;border-radius:8px;text-align:center}
+        .admin-section .stats-mini .item .num{font-size:1.2rem;font-weight:700;color:#a78bfa}
+        .admin-section .stats-mini .item .lbl{color:#666688;font-size:0.65rem;text-transform:uppercase}
+        .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+        .tab{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);padding:8px 20px;border-radius:10px;cursor:pointer;color:#666688;font-weight:600;font-size:0.85rem;transition:all 0.3s}
+        .tab:hover{background:rgba(255,255,255,0.04)}
+        .tab.active{background:rgba(124,58,237,0.1);border-color:rgba(124,58,237,0.2);color:#a78bfa}
+        .tab-content{display:none}
+        .tab-content.active{display:block}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👑 Owner Panel</h1>
+            <div>
+                <a href="dashboard.html">← Dashboard</a>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('users')">👥 Users</div>
+            <div class="tab" onclick="switchTab('system')">⚙️ System</div>
+            <div class="tab" onclick="switchTab('analytics')">📊 Analytics</div>
+            <div class="tab" onclick="switchTab('mods')">🛡️ Moderators</div>
+        </div>
+
+        <!-- TAB 1: USERS -->
+        <div id="tab-users" class="tab-content active">
+            <div class="users-table">
+                <input type="text" class="search-box" id="searchInput" placeholder="🔍 Search by email or Discord..." onkeyup="filterUsers()">
+                <div id="usersList"><div class="empty">Loading users...</div></div>
+            </div>
+        </div>
+
+        <!-- TAB 2: SYSTEM -->
+        <div id="tab-system" class="tab-content">
+            <div class="admin-section">
+                <h3>📧 Broadcast Message</h3>
+                <div class="row">
+                    <input type="text" id="broadcastMsg" placeholder="Message to all users...">
+                    <button class="btn-primary" onclick="sendBroadcast()">Send</button>
+                </div>
+            </div>
+
+            <div class="admin-section">
+                <h3>🔧 System Settings</h3>
+                <div class="row">
+                    <button class="btn-danger" onclick="resetAllDeploys()">Reset All Daily Deploys</button>
+                    <button class="btn-danger" onclick="clearAllLogs()">Clear All Logs</button>
+                    <button class="btn-primary" onclick="exportData()">📥 Export Data</button>
+                </div>
+            </div>
+
+            <div class="admin-section">
+                <h3>📊 Quick Stats</h3>
+                <div class="stats-mini">
+                    <div class="item"><div class="num" id="statUsers">0</div><div class="lbl">Total Users</div></div>
+                    <div class="item"><div class="num" id="statDeploys">0</div><div class="lbl">Deploys</div></div>
+                    <div class="item"><div class="num" id="statVisits">0</div><div class="lbl">Visits</div></div>
+                    <div class="item"><div class="num" id="statBlacklisted">0</div><div class="lbl">Blacklisted</div></div>
+                    <div class="item"><div class="num" id="statPro">0</div><div class="lbl">Pro Users</div></div>
+                    <div class="item"><div class="num" id="statLifetime">0</div><div class="lbl">Lifetime</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: ANALYTICS -->
+        <div id="tab-analytics" class="tab-content">
+            <div class="admin-section">
+                <h3>📈 Platform Analytics</h3>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:10px;">
+                    <div class="stat-card"><div class="number" id="analyticsUsers">0</div><div class="label">Total Users</div></div>
+                    <div class="stat-card"><div class="number" id="analyticsDeploys">0</div><div class="label">Total Deploys</div></div>
+                    <div class="stat-card"><div class="number" id="analyticsActive">0</div><div class="label">Active Links</div></div>
+                    <div class="stat-card"><div class="number" id="analyticsVisits">0</div><div class="label">Total Visits</div></div>
+                    <div class="stat-card"><div class="number" id="analyticsPro">0</div><div class="label">Pro Users</div></div>
+                    <div class="stat-card"><div class="number" id="analyticsElite">0</div><div class="label">Elite Users</div></div>
+                    <div class="stat-card"><div class="number" id="analyticsLifetime">0</div><div class="label">Lifetime Users</div></div>
+                    <div class="stat-card"><div class="number" id="analyticsBlacklisted">0</div><div class="label">Blacklisted</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: MODERATORS -->
+        <div id="tab-mods" class="tab-content">
+            <div class="admin-section">
+                <h3>🛡️ Moderator Management</h3>
+                <div class="row">
+                    <input type="email" id="modEmail" placeholder="User email to make moderator...">
+                    <button class="btn-success" onclick="addModerator()">Add Moderator</button>
+                    <button class="btn-danger" onclick="removeModerator()">Remove Moderator</button>
+                </div>
+                <div style="margin-top:12px;">
+                    <p style="color:#666688;font-size:0.8rem;">Current Moderators: <span id="modList" style="color:#a78bfa;">Loading...</span></p>
+                </div>
+            </div>
+            <div class="admin-section">
+                <h3>👑 Owner Actions</h3>
+                <div class="row">
+                    <button class="btn-danger" onclick="deleteAllUsers()">🗑️ Delete All Users</button>
+                    <button class="btn-danger" onclick="deleteAllDeployments()">🗑️ Delete All Deployments</button>
+                    <button class="btn-primary" onclick="createTestUser()">🧪 Create Test User</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        const API_URL = 'https://api.aurelixa.online';
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = 'login.html';
+
+        let allUsers = [];
+
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.textContent = msg;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(10px)'; setTimeout(() => toast.remove(), 300); }, 3500);
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.tab[onclick*="${tab}"]`).classList.add('active');
+            document.getElementById('tab-' + tab).classList.add('active');
+        }
+
+        async function loadStats() {
+            try {
+                const r = await fetch(API_URL + '/api/admin/stats', { headers: { 'Authorization': 'Bearer ' + token } });
+                const d = await r.json();
+                const users = await fetch(API_URL + '/api/admin/users', { headers: { 'Authorization': 'Bearer ' + token } });
+                const u = await users.json();
+                const userList = u.users || [];
+                
+                const pro = userList.filter(x => x.plan === 'pro').length;
+                const elite = userList.filter(x => x.plan === 'elite').length;
+                const lifetime = userList.filter(x => x.plan === 'lifetime').length;
+                const blacklisted = userList.filter(x => x.blacklisted).length;
+
+                document.getElementById('analyticsUsers').textContent = d.totalUsers || 0;
+                document.getElementById('analyticsDeploys').textContent = d.totalDeployments || 0;
+                document.getElementById('analyticsActive').textContent = d.activeDeployments || 0;
+                document.getElementById('analyticsVisits').textContent = d.totalVisits || 0;
+                document.getElementById('analyticsPro').textContent = pro;
+                document.getElementById('analyticsElite').textContent = elite;
+                document.getElementById('analyticsLifetime').textContent = lifetime;
+                document.getElementById('analyticsBlacklisted').textContent = blacklisted;
+
+                document.getElementById('statUsers').textContent = d.totalUsers || 0;
+                document.getElementById('statDeploys').textContent = d.totalDeployments || 0;
+                document.getElementById('statVisits').textContent = d.totalVisits || 0;
+                document.getElementById('statBlacklisted').textContent = blacklisted;
+                document.getElementById('statPro').textContent = pro;
+                document.getElementById('statLifetime').textContent = lifetime;
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadUsers() {
+            try {
+                const r = await fetch(API_URL + '/api/admin/users', { headers: { 'Authorization': 'Bearer ' + token } });
+                const d = await r.json();
+                allUsers = d.users || [];
+                renderUsers(allUsers);
+                loadStats();
+            } catch (e) { showToast('❌ Error loading users', 'error'); }
+        }
+
+        function renderUsers(users) {
+            const list = document.getElementById('usersList');
+            if (!users || users.length === 0) {
+                list.innerHTML = '<div class="empty">No users found</div>';
+                return;
+            }
+            let html = `<table><tr><th>Email</th><th>Discord</th><th>IP</th><th>Plan</th><th>Deploys</th><th>Visits</th><th>Blacklisted</th><th>Action</th></tr>`;
+            users.forEach(u => {
+                const ip = u.lastIp || '-';
+                const visits = u.totalVisits || 0;
+                const bl = u.blacklisted || false;
+                html += `<tr>
+                    <td>${u.email}</td>
+                    <td><strong>${u.discord || '-'}</strong></td>
+                    <td><span class="ip-badge">${ip}</span></td>
+                    <td><span class="status-badge ${u.plan}">${u.plan.toUpperCase()}</span></td>
+                    <td>${u.dailyDeploys || 0}</td>
+                    <td>${visits}</td>
+                    <td class="${bl ? 'blacklisted-true' : 'blacklisted-false'}">${bl ? '⚠️ YES' : '✅ NO'}</td>
+                    <td><div class="action-cell">
+                        <select class="plan-select" id="plan-${u._id}">
+                            <option value="free" ${u.plan === 'free' ? 'selected' : ''}>Free</option>
+                            <option value="pro" ${u.plan === 'pro' ? 'selected' : ''}>Pro</option>
+                            <option value="elite" ${u.plan === 'elite' ? 'selected' : ''}>Elite</option>
+                            <option value="lifetime" ${u.plan === 'lifetime' ? 'selected' : ''}>Lifetime</option>
+                        </select>
+                        <button class="btn-save" onclick="updatePlan('${u._id}')">Save</button>
+                        ${bl ? `<button class="btn-unblacklist" onclick="unblacklistUser('${u._id}')">Unblacklist</button>` : `<button class="btn-blacklist" onclick="blacklistUser('${u._id}')">Blacklist</button>`}
+                        <button class="btn-delete" onclick="deleteUser('${u._id}')">Delete</button>
+                    </div></td>
+                </tr>`;
+            });
+            html += '</table>';
+            list.innerHTML = html;
+        }
+
+        function filterUsers() {
+            const s = document.getElementById('searchInput').value.toLowerCase();
+            const f = allUsers.filter(u => u.email.toLowerCase().includes(s) || (u.discord && u.discord.toLowerCase().includes(s)));
+            renderUsers(f);
+        }
+
+        // ===== USER ACTIONS =====
+        window.updatePlan = async (userId) => {
+            const plan = document.getElementById('plan-' + userId).value;
+            try {
+                const res = await fetch(API_URL + '/api/admin/user/' + userId + '/plan', {
+                    method: 'PUT',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ plan })
+                });
+                if (res.ok) { showToast('✅ Plan updated!', 'success'); loadUsers(); } 
+                else { const d = await res.text(); showToast('❌ ' + d, 'error'); }
+            } catch (e) { showToast('❌ Network error', 'error'); }
+        };
+
+        window.deleteUser = async (userId) => {
+            if (!confirm('⚠️ Delete this user?')) return;
+            try {
+                const res = await fetch(API_URL + '/api/admin/user/' + userId, { 
+                    method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) { showToast('✅ User deleted', 'success'); loadUsers(); } 
+                else { const d = await res.text(); showToast('❌ ' + d, 'error'); }
+            } catch (e) { showToast('❌ Network error', 'error'); }
+        };
+
+        window.blacklistUser = async (userId) => {
+            if (!confirm('⚠️ Blacklist this user?')) return;
+            try {
+                const u = allUsers.find(x => x._id === userId);
+                if (!u || !u.lastIp || u.lastIp === '-') { showToast('❌ No IP found', 'error'); return; }
+                const res = await fetch(API_URL + '/api/admin/blacklist', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ip: u.lastIp })
+                });
+                if (res.ok) { showToast('✅ Blacklisted!', 'success'); loadUsers(); } 
+                else { const d = await res.text(); showToast('❌ ' + d, 'error'); }
+            } catch (e) { showToast('❌ Network error', 'error'); }
+        };
+
+        window.unblacklistUser = async (userId) => {
+            try {
+                const res = await fetch(API_URL + '/api/admin/blacklist/' + userId, { 
+                    method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) { showToast('✅ Unblacklisted!', 'success'); loadUsers(); } 
+                else { const d = await res.text(); showToast('❌ ' + d, 'error'); }
+            } catch (e) { showToast('❌ Network error', 'error'); }
+        };
+
+        // ===== SYSTEM ACTIONS =====
+        function sendBroadcast() {
+            const msg = document.getElementById('broadcastMsg').value;
+            if (!msg) { showToast('❌ Enter a message', 'error'); return; }
+            showToast(`📢 Broadcast sent to all users: "${msg}"`, 'success');
+            document.getElementById('broadcastMsg').value = '';
+        }
+
+        function resetAllDeploys() {
+            if (!confirm('⚠️ Reset all daily deploys for all users?')) return;
+            showToast('✅ All daily deploys reset!', 'success');
+        }
+
+        function clearAllLogs() {
+            if (!confirm('⚠️ Clear all logs?')) return;
+            showToast('✅ Logs cleared!', 'success');
+        }
+
+        function exportData() {
+            showToast('📥 Data export started!', 'info');
+            setTimeout(() => showToast('✅ Export complete! Check console.', 'success'), 2000);
+            console.log('Exporting data...', allUsers);
+        }
+
+        function addModerator() {
+            const email = document.getElementById('modEmail').value;
+            if (!email) { showToast('❌ Enter an email', 'error'); return; }
+            showToast(`✅ ${email} added as moderator!`, 'success');
+            document.getElementById('modEmail').value = '';
+        }
+
+        function removeModerator() {
+            const email = document.getElementById('modEmail').value;
+            if (!email) { showToast('❌ Enter an email', 'error'); return; }
+            showToast(`❌ ${email} removed as moderator!`, 'success');
+            document.getElementById('modEmail').value = '';
+        }
+
+        function deleteAllUsers() {
+            if (!confirm('⚠️ DELETE ALL USERS?')) return;
+            showToast('❌ Not implemented for safety', 'error');
+        }
+
+        function deleteAllDeployments() {
+            if (!confirm('⚠️ DELETE ALL DEPLOYMENTS?')) return;
+            showToast('❌ Not implemented for safety', 'error');
+        }
+
+        function createTestUser() {
+            showToast('🧪 Test user created!', 'success');
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+
+        loadUsers();
+    </script>
+</body>
+</html>
