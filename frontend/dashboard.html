@@ -10,77 +10,77 @@
     <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#0a0a0f;color:#e8e8e8;font-family:'Inter',sans-serif;padding:24px;min-height:100vh;position:relative}
-        body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(124,58,237,0.04) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(124,58,237,0.03) 0%,transparent 60%);pointer-events:none;z-index:0}
+        body{background:#0a0a0f;color:#f3f4f6;font-family:'Inter',sans-serif;padding:24px;min-height:100vh;position:relative}
+        body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(139,92,246,0.05) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(236,72,153,0.05) 0%,transparent 60%);pointer-events:none;z-index:0}
         .container{max-width:960px;margin:0 auto;position:relative;z-index:1}
-        .header{display:flex;justify-content:space-between;align-items:center;padding:16px 0 20px 0;border-bottom:1px solid rgba(124,58,237,0.1);margin-bottom:32px;flex-wrap:wrap;gap:12px}
-        .header h1{font-size:2rem;font-weight:900;background:linear-gradient(135deg,#7c3aed 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.5px}
-        .header .user-info{color:#8888aa;font-size:0.85rem;font-weight:500;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+        .header{display:flex;justify-content:space-between;align-items:center;padding:16px 0 20px 0;border-bottom:1px solid rgba(139,92,246,0.1);margin-bottom:32px;flex-wrap:wrap;gap:12px}
+        .header h1{font-size:2rem;font-weight:900;background:linear-gradient(135deg,#8B5CF6 0%,#EC4899 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.5px}
+        .header .user-info{color:#9ca3af;font-size:0.85rem;font-weight:500;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
         .header .user-info .plan-badge{display:inline-block;padding:3px 16px;border-radius:20px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;transition:all 0.3s ease}
-        .plan-badge.free{background:rgba(255,255,255,0.04);color:#8888aa;border:1px solid rgba(255,255,255,0.06)}
-        .plan-badge.pro{background:rgba(124,58,237,0.2);color:#a78bfa;border:1px solid rgba(124,58,237,0.3);box-shadow:0 0 20px rgba(124,58,237,0.1)}
-        .plan-badge.elite{background:rgba(124,58,237,0.2);color:#a78bfa;border:1px solid rgba(124,58,237,0.3);box-shadow:0 0 20px rgba(124,58,237,0.1)}
+        .plan-badge.free{background:rgba(255,255,255,0.04);color:#9ca3af;border:1px solid rgba(255,255,255,0.06)}
+        .plan-badge.pro{background:rgba(139,92,246,0.2);color:#8B5CF6;border:1px solid rgba(139,92,246,0.3);box-shadow:0 0 20px rgba(139,92,246,0.1)}
+        .plan-badge.elite{background:rgba(139,92,246,0.2);color:#8B5CF6;border:1px solid rgba(139,92,246,0.3);box-shadow:0 0 20px rgba(139,92,246,0.1)}
         .plan-badge.lifetime{background:rgba(241,196,15,0.15);color:#f1c40f;border:1px solid rgba(241,196,15,0.2);box-shadow:0 0 20px rgba(241,196,15,0.05)}
-        .plan-badge.owner{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:1px solid #7c3aed;box-shadow:0 0 30px rgba(124,58,237,0.2)}
-        .role-badge.user{background:rgba(255,255,255,0.04);color:#666688;border:1px solid rgba(255,255,255,0.04);display:inline-block;padding:2px 12px;border-radius:20px;font-size:0.6rem;font-weight:700;text-transform:uppercase;margin-left:8px}
+        .plan-badge.owner{background:linear-gradient(135deg,#8B5CF6,#EC4899);color:#fff;border:1px solid #8B5CF6;box-shadow:0 0 30px rgba(139,92,246,0.2)}
+        .role-badge.user{background:rgba(255,255,255,0.04);color:#9ca3af;border:1px solid rgba(255,255,255,0.04);display:inline-block;padding:2px 12px;border-radius:20px;font-size:0.6rem;font-weight:700;text-transform:uppercase;margin-left:8px}
         .role-badge.owner{background:rgba(241,196,15,0.2);color:#f1c40f;border:1px solid rgba(241,196,15,0.3);display:inline-block;padding:2px 12px;border-radius:20px;font-size:0.6rem;font-weight:700;text-transform:uppercase;margin-left:8px}
-        .header a{color:#666688;text-decoration:none;font-size:0.8rem;font-weight:600;transition:all 0.3s ease;padding:4px 0;position:relative}
-        .header a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:#7c3aed;transition:width 0.3s ease;border-radius:2px}
-        .header a:hover{color:#a78bfa}
+        .header a{color:#9ca3af;text-decoration:none;font-size:0.8rem;font-weight:600;transition:all 0.3s ease;padding:4px 0;position:relative}
+        .header a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:linear-gradient(135deg,#8B5CF6,#EC4899);transition:width 0.3s ease;border-radius:2px}
+        .header a:hover{color:#8B5CF6}
         .header a:hover::after{width:100%}
-        .logout-btn{background:rgba(255,255,255,0.03);color:#8888aa;border:1px solid rgba(255,255,255,0.06);padding:6px 20px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:0.8rem;font-weight:600;transition:all 0.3s ease}
-        .logout-btn:hover{background:rgba(124,58,237,0.1);border-color:rgba(124,58,237,0.2);color:#a78bfa;transform:translateY(-1px)}
+        .logout-btn{background:rgba(255,255,255,0.03);color:#9ca3af;border:1px solid rgba(255,255,255,0.06);padding:6px 20px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:0.8rem;font-weight:600;transition:all 0.3s ease}
+        .logout-btn:hover{background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.2);color:#8B5CF6;transform:translateY(-1px)}
         .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:16px;margin-bottom:28px}
-        .stat-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:16px;padding:20px 16px;text-align:center;backdrop-filter:blur(10px);transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);position:relative;overflow:hidden}
-        .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,0.2),transparent);opacity:0;transition:opacity 0.4s ease}
-        .stat-card:hover{transform:translateY(-4px);border-color:rgba(124,58,237,0.15);box-shadow:0 12px 40px rgba(0,0,0,0.3)}
+        .stat-card{background:rgba(17,24,39,0.6);border:1px solid rgba(255,255,255,0.04);border-radius:16px;padding:20px 16px;text-align:center;backdrop-filter:blur(10px);transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);position:relative;overflow:hidden}
+        .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(139,92,246,0.2),transparent);opacity:0;transition:opacity 0.4s ease}
+        .stat-card:hover{transform:translateY(-4px);border-color:rgba(139,92,246,0.15);box-shadow:0 12px 40px rgba(0,0,0,0.3)}
         .stat-card:hover::before{opacity:1}
-        .stat-card .number{font-size:2.4rem;font-weight:800;background:linear-gradient(135deg,#7c3aed 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-        .stat-card .label{color:#666688;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-top:4px}
-        .btn-deploy{width:100%;background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);color:#fff;border:none;padding:18px;font-size:1.1rem;font-weight:700;border-radius:14px;cursor:pointer;transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);font-family:inherit;letter-spacing:0.3px;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(124,58,237,0.2)}
+        .stat-card .number{font-size:2.4rem;font-weight:800;background:linear-gradient(135deg,#8B5CF6 0%,#EC4899 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .stat-card .label{color:#9ca3af;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-top:4px}
+        .btn-deploy{width:100%;background:linear-gradient(135deg,#8B5CF6 0%,#EC4899 100%);color:#fff;border:none;padding:18px;font-size:1.1rem;font-weight:700;border-radius:14px;cursor:pointer;transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);font-family:inherit;letter-spacing:0.3px;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(139,92,246,0.2)}
         .btn-deploy::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent);transition:left 0.6s ease}
         .btn-deploy:hover::before{left:100%}
-        .btn-deploy:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(124,58,237,0.35)}
+        .btn-deploy:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(139,92,246,0.35)}
         .btn-deploy:active{transform:translateY(0px) scale(0.98)}
         .btn-deploy:disabled{opacity:0.4;cursor:not-allowed;transform:none !important;box-shadow:none !important}
-        .deploy-status{color:#666688;margin-top:12px;font-size:0.85rem;font-weight:500;text-align:center;min-height:24px}
-        .spinner{display:none;width:36px;height:36px;margin:14px auto;border:3px solid rgba(124,58,237,0.1);border-top:3px solid #7c3aed;border-radius:50%;animation:spin 0.8s cubic-bezier(0.6,0,0.4,1) infinite}
+        .deploy-status{color:#9ca3af;margin-top:12px;font-size:0.85rem;font-weight:500;text-align:center;min-height:24px}
+        .spinner{display:none;width:36px;height:36px;margin:14px auto;border:3px solid rgba(139,92,246,0.1);border-top:3px solid #8B5CF6;border-radius:50%;animation:spin 0.8s cubic-bezier(0.6,0,0.4,1) infinite}
         .spinner.show{display:block}
         @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-        .section{background:rgba(255,255,255,0.02);border-radius:16px;padding:24px 28px;margin-top:24px;border:1px solid rgba(255,255,255,0.04);backdrop-filter:blur(10px);transition:all 0.3s ease}
-        .section:hover{border-color:rgba(124,58,237,0.08)}
-        .section h2{color:#c8c8e8;font-size:1rem;font-weight:700;margin-bottom:14px;letter-spacing:-0.3px}
-        .section label{color:#666688;display:block;margin-bottom:4px;font-size:0.8rem;font-weight:600}
-        .section input{width:100%;padding:12px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;color:#e8e8e8;font-size:0.9rem;font-family:inherit;font-weight:400;transition:all 0.3s ease}
-        .section input:focus{outline:none;border-color:rgba(124,58,237,0.3);box-shadow:0 0 30px rgba(124,58,237,0.04);background:rgba(255,255,255,0.04)}
+        .section{background:rgba(17,24,39,0.6);border-radius:16px;padding:24px 28px;margin-top:24px;border:1px solid rgba(255,255,255,0.04);backdrop-filter:blur(10px);transition:all 0.3s ease}
+        .section:hover{border-color:rgba(139,92,246,0.08)}
+        .section h2{color:#f3f4f6;font-size:1rem;font-weight:700;margin-bottom:14px;letter-spacing:-0.3px}
+        .section label{color:#9ca3af;display:block;margin-bottom:4px;font-size:0.8rem;font-weight:600}
+        .section input{width:100%;padding:12px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;color:#f3f4f6;font-size:0.9rem;font-family:inherit;font-weight:400;transition:all 0.3s ease}
+        .section input:focus{outline:none;border-color:rgba(139,92,246,0.3);box-shadow:0 0 30px rgba(139,92,246,0.04);background:rgba(255,255,255,0.04)}
         .section input::placeholder{color:#444466}
-        .btn-small{background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);color:#fff;border:none;padding:10px 24px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:0.85rem;font-weight:600;transition:all 0.3s ease;box-shadow:0 2px 12px rgba(124,58,237,0.15)}
-        .btn-small:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(124,58,237,0.25)}
-        .btn-test{background:transparent;color:#a78bfa;border:1px solid rgba(124,58,237,0.2);padding:10px 24px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:0.85rem;font-weight:600;transition:all 0.3s ease}
-        .btn-test:hover{background:rgba(124,58,237,0.06);border-color:rgba(124,58,237,0.3);transform:translateY(-2px);box-shadow:0 4px 20px rgba(124,58,237,0.05)}
+        .btn-small{background:linear-gradient(135deg,#8B5CF6 0%,#EC4899 100%);color:#fff;border:none;padding:10px 24px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:0.85rem;font-weight:600;transition:all 0.3s ease;box-shadow:0 2px 12px rgba(139,92,246,0.15)}
+        .btn-small:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(139,92,246,0.25)}
+        .btn-test{background:transparent;color:#8B5CF6;border:1px solid rgba(139,92,246,0.2);padding:10px 24px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:0.85rem;font-weight:600;transition:all 0.3s ease}
+        .btn-test:hover{background:rgba(139,92,246,0.06);border-color:rgba(139,92,246,0.3);transform:translateY(-2px);box-shadow:0 4px 20px rgba(139,92,246,0.05)}
         .flex-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
         .flex-row input{flex:1;min-width:180px}
         .flex-row input[type="number"]{flex:0 0 80px;min-width:80px}
         .deployment-item{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.03);flex-wrap:wrap;gap:8px;transition:all 0.3s ease}
         .deployment-item:hover{padding-left:8px}
-        .deployment-item .url{color:#a78bfa;font-weight:600;font-size:0.85rem}
+        .deployment-item .url{color:#8B5CF6;font-weight:600;font-size:0.85rem}
         .deployment-item .status{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;padding:2px 12px;border-radius:20px}
         .deployment-item .status.active{background:rgba(78,255,106,0.1);color:#4eff6a;border:1px solid rgba(78,255,106,0.1)}
-        .deployment-item .status.expired{background:rgba(255,255,255,0.03);color:#666688;border:1px solid rgba(255,255,255,0.04)}
+        .deployment-item .status.expired{background:rgba(255,255,255,0.03);color:#9ca3af;border:1px solid rgba(255,255,255,0.04)}
         .deployment-item .delete-btn{background:transparent;color:#e74c5e;border:1px solid rgba(231,76,94,0.15);padding:4px 14px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.7rem;font-weight:600;transition:all 0.3s ease}
         .deployment-item .delete-btn:hover{background:rgba(231,76,94,0.1);border-color:rgba(231,76,94,0.3);transform:scale(1.02)}
-        .upgrade-section{background:rgba(124,58,237,0.03);border:1.5px dashed rgba(124,58,237,0.15);border-radius:16px;padding:24px 28px;text-align:center;margin-top:24px;transition:all 0.4s ease}
-        .upgrade-section:hover{border-color:rgba(124,58,237,0.25);background:rgba(124,58,237,0.04);box-shadow:0 0 40px rgba(124,58,237,0.02)}
-        .upgrade-section p{color:#8888aa;font-size:0.85rem;font-weight:500;margin-bottom:4px}
-        .upgrade-section .highlight{color:#a78bfa;font-weight:700}
-        .upgrade-section a{color:#a78bfa;text-decoration:none;font-size:0.8rem;font-weight:600;transition:all 0.3s ease;display:inline-block}
-        .upgrade-section a:hover{color:#c4b5fd;transform:translateX(4px)}
+        .upgrade-section{background:rgba(139,92,246,0.03);border:1.5px dashed rgba(139,92,246,0.15);border-radius:16px;padding:24px 28px;text-align:center;margin-top:24px;transition:all 0.4s ease}
+        .upgrade-section:hover{border-color:rgba(139,92,246,0.25);background:rgba(139,92,246,0.04);box-shadow:0 0 40px rgba(139,92,246,0.02)}
+        .upgrade-section p{color:#9ca3af;font-size:0.85rem;font-weight:500;margin-bottom:4px}
+        .upgrade-section .highlight{color:#8B5CF6;font-weight:700}
+        .upgrade-section a{color:#8B5CF6;text-decoration:none;font-size:0.8rem;font-weight:600;transition:all 0.3s ease;display:inline-block}
+        .upgrade-section a:hover{color:#EC4899;transform:translateX(4px)}
         .empty{color:#444466;text-align:center;padding:20px;font-size:0.85rem;font-weight:500}
         .status-msg{margin-top:4px;font-size:0.8rem;font-weight:500}
         .status-msg.success{color:#4eff6a}
         .status-msg.error{color:#e74c5e}
-        .status-msg.info{color:#666688}
-        .bulk-result{color:#a78bfa;font-size:0.8rem;padding:4px 0}
+        .status-msg.info{color:#9ca3af}
+        .bulk-result{color:#8B5CF6;font-size:0.8rem;padding:4px 0}
         @media (max-width:600px){.header h1{font-size:1.5rem}.section{padding:18px 16px}.stats{grid-template-columns:repeat(2,1fr)}.stat-card .number{font-size:1.8rem}}
     </style>
 </head>
@@ -128,9 +128,9 @@
             <h2>📥 Export Data</h2>
             <div class="flex-row">
                 <button class="btn-small" onclick="exportAllLogs()">📊 Export All Logs</button>
-                <span style="color:#666688;font-size:0.8rem;" id="exportStatus">Pro+ feature</span>
+                <span style="color:#9ca3af;font-size:0.8rem;" id="exportStatus">Pro+ feature</span>
             </div>
-            <div id="exportResult" style="color:#666688;font-size:0.8rem;margin-top:8px;"></div>
+            <div id="exportResult" style="color:#9ca3af;font-size:0.8rem;margin-top:8px;"></div>
         </div>
 
         <!-- BULK DEPLOY SECTION -->
@@ -139,9 +139,9 @@
             <div class="flex-row">
                 <input type="number" id="bulkCount" value="3" min="1" max="10">
                 <button class="btn-small" onclick="bulkDeploy()">🚀 Deploy Multiple</button>
-                <span style="color:#666688;font-size:0.8rem;" id="bulkStatus">Elite+ feature</span>
+                <span style="color:#9ca3af;font-size:0.8rem;" id="bulkStatus">Elite+ feature</span>
             </div>
-            <div id="bulkResult" style="color:#666688;font-size:0.8rem;margin-top:8px;"></div>
+            <div id="bulkResult" style="color:#9ca3af;font-size:0.8rem;margin-top:8px;"></div>
         </div>
 
         <div class="section">
@@ -223,7 +223,7 @@
                             <span class="url">${d.url}</span>
                             <span>
                                 <span class="status ${active ? 'active' : 'expired'}">${active ? 'Active' : 'Expired'}</span>
-                                <span style="color:#666688;font-size:0.7rem;margin-left:8px;">${d.visits || 0} visits</span>
+                                <span style="color:#9ca3af;font-size:0.7rem;margin-left:8px;">${d.visits || 0} visits</span>
                                 ${active ? `<button class="delete-btn" onclick="deleteDeploy('${d.subdomain}')">Delete</button>` : ''}
                             </span>
                         </div>
@@ -256,7 +256,7 @@
                     const date = new Date(d.createdAt).toLocaleDateString();
                     html += `
                         <div class="deployment-item">
-                            <span class="url" style="color:#666688;">${d.url}</span>
+                            <span class="url" style="color:#9ca3af;">${d.url}</span>
                             <span>
                                 <span class="status expired">Expired</span>
                                 <span style="color:#444466;font-size:0.7rem;margin-left:8px;">${date}</span>
@@ -399,7 +399,7 @@
                 return;
             }
             result.textContent = '⏳ Sending test...';
-            result.style.color = '#666688';
+            result.style.color = '#9ca3af';
             try {
                 const res = await fetch(webhook, {
                     method: 'POST',
@@ -409,7 +409,7 @@
                         embeds: [{
                             title: 'Test Notification',
                             description: 'Your Discord webhook is working correctly!',
-                            color: 0x7c3aed,
+                            color: 0x8B5CF6,
                             footer: { text: 'Aurelixa Platform' },
                             timestamp: new Date().toISOString()
                         }]
