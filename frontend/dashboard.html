@@ -95,6 +95,8 @@
         .modal-btn-danger:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(231,76,94,0.3)}
         @keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
         @keyframes slideUp{0%{opacity:0;transform:translateY(30px) scale(0.96)}100%{opacity:1;transform:translateY(0) scale(1)}}
+        .toast-msg{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(78,255,106,0.1);border:1px solid rgba(78,255,106,0.2);color:#4eff6a;padding:12px 28px;border-radius:12px;font-size:0.9rem;font-weight:600;z-index:99999;animation:slideUp 0.4s ease;backdrop-filter:blur(10px)}
+        .toast-msg.error{background:rgba(231,76,94,0.1);border-color:rgba(231,76,94,0.2);color:#e74c5e}
         
         @media (max-width:600px){.header h1{font-size:1.5rem}.section{padding:18px 16px}.stats{grid-template-columns:repeat(2,1fr)}.stat-card .number{font-size:1.8rem}}
     </style>
@@ -168,6 +170,8 @@
         </div>
     </div>
 
+    <div id="toastContainer"></div>
+
     <script>
         const API_URL = 'https://api.aurelixa.online';
         let token = localStorage.getItem('token');
@@ -177,6 +181,7 @@
 
         // ===== DELETE MODAL FUNCTIONS =====
         function showDeleteModal(subdomain) {
+            console.log('🗑️ Delete modal opened for:', subdomain);
             deleteSubdomain = subdomain;
             document.getElementById('deleteModal').classList.add('show');
         }
@@ -187,6 +192,7 @@
         }
 
         document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+            console.log('✅ Confirm delete clicked, subdomain:', deleteSubdomain);
             if (deleteSubdomain) {
                 await deleteDeploy(deleteSubdomain);
                 closeDeleteModal();
@@ -200,12 +206,44 @@
             }
         });
 
-        // Close modal with Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeDeleteModal();
+        // ===== DELETE DEPLOYMENT =====
+        async function deleteDeploy(subdomain) {
+            console.log('🗑️ Deleting deployment:', subdomain);
+            try {
+                const res = await fetch(API_URL + '/api/deploy/' + subdomain, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                console.log('📡 Delete response status:', res.status);
+                if (res.ok) {
+                    showToast('✅ Deployment deleted', 'success');
+                    loadDeployments();
+                    loadHistory();
+                    loadStats();
+                } else {
+                    const d = await res.text();
+                    console.log('❌ Delete error:', d);
+                    showToast('❌ ' + d, 'error');
+                }
+            } catch (e) {
+                console.log('❌ Delete network error:', e);
+                showToast('❌ Network error', 'error');
             }
-        });
+        }
+
+        // ===== SHOW TOAST =====
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast-msg' + (type === 'error' ? ' error' : '');
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(20px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
 
         // ===== LOAD USER =====
         async function loadUser() {
@@ -468,41 +506,6 @@
                 result.style.color = '#e74c5e';
             }
         });
-
-        // ===== DELETE DEPLOYMENT =====
-        async function deleteDeploy(subdomain) {
-            try {
-                const res = await fetch(API_URL + '/api/deploy/' + subdomain, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                if (res.ok) {
-                    showToast('✅ Deployment deleted', 'success');
-                    loadDeployments();
-                    loadHistory();
-                    loadStats();
-                } else {
-                    const d = await res.text();
-                    showToast('❌ ' + d, 'error');
-                }
-            } catch (e) {
-                showToast('❌ Network error', 'error');
-            }
-        }
-
-        // ===== TOAST =====
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = 'toast-msg' + (type === 'error' ? ' error' : '');
-            toast.textContent = message;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(-50%) translateY(20px)';
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
-        }
 
         // ===== LOGOUT =====
         function logout() {
