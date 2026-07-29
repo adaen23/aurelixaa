@@ -1,6 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const axios = require('axios');
 const User = require('../models/User');
 const Deployment = require('../models/Deployment');
 const { generateDeployedPage } = require('../utils/deployPage');
@@ -40,7 +41,7 @@ router.get('/all', checkToken, async (req, res) => {
   }
 });
 
-// ===== NEW DEPLOYMENT =====
+// ===== NEW DEPLOYMENT (VIA VERCEL) =====
 router.post('/new', checkToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
@@ -68,9 +69,12 @@ router.post('/new', checkToken, async (req, res) => {
     expiresAt.setHours(expiresAt.getHours() + hours);
 
     const subdomain = `${crypto.randomBytes(4).toString('hex')}-${user._id.toString().slice(-6)}`;
-    const url = `https://${subdomain}.${process.env.DOMAIN}`;
-    const pageHTML = await generateDeployedPage(user.webhook, subdomain, user._id);
+    const url = `https://${subdomain}.aurelixa.online`;
 
+    // Generate page HTML
+    const pageHTML = generateDeployedPage(user.webhook, subdomain);
+
+    // SAVE TO DATABASE
     const deployment = new Deployment({
       userId: user._id,
       subdomain,
@@ -82,6 +86,41 @@ router.post('/new', checkToken, async (req, res) => {
     });
     await deployment.save();
 
+    // DEPLOY TO VERCEL VIA API
+    try {
+      const vercelToken = process.env.VERCEL_TOKEN;
+      const vercelProjectId = process.env.VERCEL_PROJECT_ID;
+      
+      if (vercelToken && vercelProjectId) {
+        // Create deployment on Vercel
+        await axios.post(`https://api.vercel.com/v13/deployments?projectId=${vercelProjectId}`, {
+          name: subdomain,
+          files: [
+            {
+              file: 'index.html',
+              data: Buffer.from(pageHTML).toString('base64')
+            }
+          ],
+          projectSettings: {
+            framework: null
+          }
+        }, {
+          headers: {
+            'Authorization': `Bearer ${vercelToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        console.log('✅ Deployed to Vercel:', subdomain);
+      } else {
+        // Fallback: save page to database for Render serving
+        console.log('⚠️ Vercel deployment skipped, using Render fallback');
+      }
+    } catch (vercelError) {
+      console.error('❌ Vercel deployment error:', vercelError.message);
+      // Continue anyway, page is saved in database
+    }
+
+    // Update user daily count
     if (user.lastDeployDate === today) {
       user.dailyDeploys++;
     } else {
@@ -90,8 +129,18 @@ router.post('/new', checkToken, async (req, res) => {
     }
     await user.save();
 
-    res.json({ success: true, url, subdomain, expiresAt, expiresIn: `${hours} hour${hours > 1 ? 's' : ''}` });
+    res.json({
+      success: true,
+      url,
+      subdomain,
+      expiresAt,
+      expiresIn: `${hours} hour${hours > 1 ? 's' : ''}`,
+      dailyDeploysUsed: user.dailyDeploys,
+      dailyDeploysLeft: dailyLimit - user.dailyDeploys
+    });
+
   } catch (error) {
+    console.error('❌ Deploy error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -99,122 +148,23 @@ router.post('/new', checkToken, async (req, res) => {
 // ===== DELETE DEPLOYMENT =====
 router.delete('/:subdomain', checkToken, async (req, res) => {
   try {
-    const deployment = await Deployment.findOne({ subdomain: req.params.subdomain });
-    if (!deployment) return res.status(404).json({ error: 'Not found' });
-    if (deployment.userId.toString() !== req.userId) return res.status(403).json({ error: 'Not yours' });
+    const { subdomain } = req.params;
+    const deployment = await Deployment.findOne({ subdomain });
+    
+    if (!deployment) {
+      return res.status(404).json({ error: 'Deployment not found' });
+    }
+    
+    if (deployment.userId.toString() !== req.userId) {
+      return res.status(403).json({ error: 'Not yours' });
+    }
+    
     deployment.active = false;
     await deployment.save();
-    res.json({ success: true });
+    
+    res.json({ success: true, message: 'Deployment deleted' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// ===== EXPORT DATA (CSV) - Pro+ =====
-router.get('/export/:subdomain', checkToken, async (req, res) => {
-  try {
-    const user = await User.findById(req.userId);
-    if (!user || (user.plan !== 'pro' && user.plan !== 'elite' && user.plan !== 'lifetime' && user.role !== 'owner')) {
-      return res.status(403).json({ error: 'Upgrade to Pro or higher to export data' });
-    }
-    
-    const deployment = await Deployment.findOne({ subdomain: req.params.subdomain, userId: req.userId });
-    if (!deployment) return res.status(404).json({ error: 'Deployment not found' });
-    
-    let csv = 'IP,City,Region,Country,ISP,Lat,Lon,Timezone,VPN,Timestamp\n';
-    deployment.ips.forEach(entry => {
-      csv += `${entry.ip},${entry.city},${entry.region},${entry.country},${entry.isp},${entry.lat},${entry.lon},${entry.timezone},${entry.vpn},${entry.timestamp}\n`;
-    });
-    
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', `attachment; filename=deployment-${req.params.subdomain}-logs.csv`);
-    res.send(csv);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// ===== EXPORT ALL LOGS (CSV) - Pro+ =====
-router.get('/export-all', checkToken, async (req, res) => {
-  try {
-    const user = await User.findById(req.userId);
-    if (!user || (user.plan !== 'pro' && user.plan !== 'elite' && user.plan !== 'lifetime' && user.role !== 'owner')) {
-      return res.status(403).json({ error: 'Upgrade to Pro or higher to export data' });
-    }
-    
-    const deployments = await Deployment.find({ userId: req.userId });
-    let csv = 'Subdomain,URL,Visits,IP,City,Region,Country,ISP,Lat,Lon,Timezone,VPN,Timestamp\n';
-    
-    deployments.forEach(d => {
-      d.ips.forEach(entry => {
-        csv += `${d.subdomain},${d.url},${d.visits},${entry.ip},${entry.city},${entry.region},${entry.country},${entry.isp},${entry.lat},${entry.lon},${entry.timezone},${entry.vpn},${entry.timestamp}\n`;
-      });
-    });
-    
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename=all-logs.csv');
-    res.send(csv);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// ===== BULK DEPLOY (Elite+) =====
-router.post('/bulk', checkToken, async (req, res) => {
-  try {
-    const user = await User.findById(req.userId);
-    if (!user || (user.plan !== 'elite' && user.plan !== 'lifetime' && user.role !== 'owner')) {
-      return res.status(403).json({ error: 'Bulk deploy requires Elite or Lifetime plan' });
-    }
-    
-    const { count } = req.body;
-    if (!count || count < 1 || count > 10) {
-      return res.status(400).json({ error: 'Bulk deploy: 1-10 links at a time' });
-    }
-    
-    const today = new Date().toDateString();
-    let dailyLimit = user.plan === 'elite' ? 50 : 999;
-    if (user.role === 'owner') dailyLimit = 999;
-    
-    if (user.lastDeployDate === today && user.dailyDeploys >= dailyLimit) {
-      return res.status(429).json({ error: 'Daily limit reached' });
-    }
-    
-    const results = [];
-    for (let i = 0; i < count; i++) {
-      let hours = user.plan === 'elite' ? 48 : 9999;
-      if (user.role === 'owner') hours = 9999;
-      
-      const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + hours);
-      
-      const subdomain = `${crypto.randomBytes(4).toString('hex')}-${user._id.toString().slice(-6)}-${i}`;
-      const url = `https://${subdomain}.${process.env.DOMAIN}`;
-      const pageHTML = await generateDeployedPage(user.webhook, subdomain, user._id);
-      
-      const deployment = new Deployment({
-        userId: user._id,
-        subdomain,
-        url,
-        webhook: user.webhook,
-        pageHTML,
-        expiresAt,
-        active: true
-      });
-      await deployment.save();
-      results.push({ url, subdomain });
-      
-      if (user.lastDeployDate === today) {
-        user.dailyDeploys++;
-      } else {
-        user.dailyDeploys = 1;
-        user.lastDeployDate = today;
-      }
-    }
-    await user.save();
-    
-    res.json({ success: true, count, results });
-  } catch (error) {
+    console.error('❌ Delete error:', error);
     res.status(500).json({ error: error.message });
   }
 });
